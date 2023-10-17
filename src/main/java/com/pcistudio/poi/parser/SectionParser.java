@@ -1,6 +1,6 @@
-package org.jmd.oem.parser;
+package com.pcistudio.poi.parser;
 
-import org.jmd.oem.util.PoiUtil;
+import com.pcistudio.poi.util.PoiUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.util.StringUtil;

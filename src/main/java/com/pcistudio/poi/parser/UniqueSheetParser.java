@@ -1,4 +1,4 @@
-package org.jmd.oem.parser;
+package com.pcistudio.poi.parser;
 
 public abstract class UniqueSheetParser<T> implements SheetParser<T> {
     public String getSheetName() {

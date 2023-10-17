@@ -1,14 +1,48 @@
 plugins {
     id 'java-library'
+    id 'maven-publish'
 }
 
-group = 'org.jmd.oem'
+group = 'com.pcistudio'
 version = '1.0-SNAPSHOT'
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            groupId = 'com.pcistudio'
+            artifactId = 'object-poi'
+            version = '1.0-SNAPSHOT'
+
+            pom {
+                name = 'object-poi'
+                description = 'Object Excel Mapping library to help with the parsing of complex excel documents'
+                url = 'https://github.com/ymdomenech/object-poi'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+            credentials {
+                username = project.findProperty("ossrhUsername") ?: System.getenv("OSSRH_USERNAME")
+                password = project.findProperty("ossrhPassword") ?: System.getenv("OSSRH_PASSWORD")
+            }
+        }
+    }
+}
 
 repositories {
     mavenCentral()
 }
-
 
 java {
     sourceCompatibility = '11'
