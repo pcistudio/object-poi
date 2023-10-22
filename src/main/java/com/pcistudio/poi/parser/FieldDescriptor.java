@@ -4,11 +4,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+//TODO Found 7 columns. [FY6786, 2022, FORD, F-250, 100, 24, E9*F9]. Get an exception when the none of the
+// columns match the expected columns
+//TODO fix the formulas
 public class FieldDescriptor {
     private static final Logger LOG = LoggerFactory.getLogger(FieldDescriptor.class);
 
@@ -46,9 +50,10 @@ public class FieldDescriptor {
         return required;
     }
 
+    @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     public static Map<String, FieldDescriptor> loadFrom(Class columnClass) {
         if (columnClass == null) {
-            return null;
+            return new HashMap<>();
         }
         Field[] declaredFields = columnClass.getDeclaredFields();
         Map<String, FieldDescriptor> verticalFieldsMap = Stream.of(declaredFields)
@@ -61,7 +66,7 @@ public class FieldDescriptor {
                 .filter(fieldDescriptor -> FieldDescriptor.EMPTY != fieldDescriptor)
                 .collect(Collectors.toMap(FieldDescriptor::getName, Function.identity()));
 
-        LOG.info("Loaded {} fields from {}", verticalFieldsMap.size(), columnClass);
+        LOG.debug("Loaded {} fields from {}", verticalFieldsMap.size(), columnClass);
         return verticalFieldsMap;
     }
 }

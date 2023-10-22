@@ -3,6 +3,8 @@ package com.pcistudio.poi.parser;
 import java.util.List;
 
 public class PivotSectionParserBuilder<T> {
+
+    private static final int MIN_PIVOT_COLUMN = 2;
     private String name;
     private List<T> objectToBuild;
 
@@ -16,46 +18,46 @@ public class PivotSectionParserBuilder<T> {
 
     private Class<T> recordClass;
 
-    public PivotSectionParserBuilder<T> name(String name) {
+    public PivotSectionParserBuilder<T> withName(String name) {
         this.name = name;
         return this;
     }
 
-    public PivotSectionParserBuilder<T> objectToBuild(List<T> objectToBuild) {
+    public PivotSectionParserBuilder<T> withObjectToBuild(List<T> objectToBuild) {
         this.objectToBuild = objectToBuild;
         return this;
     }
 
-    public PivotSectionParserBuilder<T> startName(String startName) {
+    public PivotSectionParserBuilder<T> withStartName(String startName) {
         this.startName = startName;
         return this;
     }
 
-    public PivotSectionParserBuilder<T> rowStartIndex(int rowStartIndex) {
+    public PivotSectionParserBuilder<T> withRowStartIndex(int rowStartIndex) {
         this.rowStartIndex = rowStartIndex;
         return this;
     }
 
-    public PivotSectionParserBuilder<T> columnStartIndex(int columnStartIndex) {
+    public PivotSectionParserBuilder<T> withColumnStartIndex(int columnStartIndex) {
         this.columnStartIndex = columnStartIndex;
         return this;
     }
 
-    public PivotSectionParserBuilder<T> columnCount(short columnCount) {
-        if(columnCount < 2) {
+    public PivotSectionParserBuilder<T> withColumnCount(short columnCount) {
+        if(columnCount < MIN_PIVOT_COLUMN) {
             throw new IllegalArgumentException("columnCount min value is 2");
         }
         this.columnCount = columnCount;
         return this;
     }
 
-    public PivotSectionParserBuilder<T> recordClass(Class<T> recordClass) {
+    public PivotSectionParserBuilder<T> withRecordClass(Class<T> recordClass) {
         this.recordClass = recordClass;
         return this;
     }
 
     public PivotSectionParserBuilder<T> keyValue() {
-        return columnCount((short) 2);
+        return withColumnCount((short) 2);
     }
 
     public PivotSectionParser<T> build() {
@@ -67,7 +69,7 @@ public class PivotSectionParserBuilder<T> {
                         .columnStartIndex(columnStartIndex)
                         .columnCount(columnCount)
                         .objectClass(recordClass)
-                        .descriptorMap(FieldDescriptor.loadFrom(objectToBuild == null ? null : objectToBuild.getClass()))
+                        .descriptorMap(FieldDescriptor.loadFrom(recordClass))
                         .build()
         );
     }

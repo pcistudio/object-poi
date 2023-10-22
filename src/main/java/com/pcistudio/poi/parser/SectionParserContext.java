@@ -32,6 +32,10 @@ public class SectionParserContext<T> {
         return columnCount;
     }
 
+    public boolean isKeyValue() {
+        return columnCount == 2;
+    }
+
     public int getColumnStartIndex() {
         return columnStartIndex;
     }

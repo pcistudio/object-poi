@@ -40,7 +40,7 @@ public class SectionParserManager implements AutoCloseable {
 
 
     private void notifyCompletion(SectionParser<?> sectionParser) {
-        if (currentSectionParser!=null && currentSectionParser != sectionParser){
+        if (currentSectionParser != null && !currentSectionParser.equals(sectionParser)) {
             currentSectionParser.notifyCompletion();
         }
     }
@@ -49,11 +49,8 @@ public class SectionParserManager implements AutoCloseable {
     public void close() {
         if (currentSectionParser != null) {
             currentSectionParser.notifyCompletion();
-            currentSectionParser = null;
         }
     }
-
-
 
 
 }

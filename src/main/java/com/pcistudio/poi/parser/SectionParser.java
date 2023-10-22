@@ -27,7 +27,7 @@ public abstract class SectionParser<T> {
         this.objectToBuild = objectToBuild;
 //        TODO data will be ignored. Probably remove
         if (this.objectToBuild == null) {
-            LOG.warn("Data will be ignored for section={}", getName());
+            LOG.warn("Data will be ignored for section={}", name);
         }
         if (isStartIndexNotSet() && isStartNameNotSet()) {
             throw new IllegalStateException("Section startIndex and startName are both undefined. You need to set at least one");
@@ -46,19 +46,19 @@ public abstract class SectionParser<T> {
         return started;
     }
 
-    public boolean isStartIndexNotSet() {
+    private boolean isStartIndexNotSet() {
         return context.getRowStartIndex() < 0;
     }
 
-    public boolean isStartNameNotSet() {
+    private boolean isStartNameNotSet() {
         return StringUtil.isBlank(context.getStartName());
     }
 
-    public boolean isStartIndexSet() {
+    private boolean isStartIndexSet() {
         return !isStartIndexNotSet();
     }
 
-    public boolean isStartNameSet() {
+    private boolean isStartNameSet() {
         return !isStartNameNotSet();
     }
 
@@ -76,7 +76,7 @@ public abstract class SectionParser<T> {
         }
         started = isActive(row.getCell(0), rowIndex);
         if (started) {
-            LOG.debug("Selected section parser {}", getName());
+            LOG.debug("Selected sectionParser='{}' in row={}", getName(), rowIndex);
         }
         return started;
     }
@@ -131,6 +131,7 @@ public abstract class SectionParser<T> {
         }
     }
 
+    @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
     protected void populateRowObject(Object modelObject, String columnName, Cell valueCell) throws IllegalAccessException {
         if (StringUtil.isBlank(columnName)) {
            throw new IllegalArgumentException("columnName cannot be null");
@@ -139,7 +140,7 @@ public abstract class SectionParser<T> {
         if (fieldDescriptor == null) {
             return;
         }
-        String value = PoiUtil.cellStringTrim(valueCell);
+        String value = PoiUtil.cellStringTrim(valueCell, fieldDescriptor.getFormat());
         if (fieldDescriptor.isRequired() && value == null) {
             throw new IllegalArgumentException(String.format("Column=%s cannot be null", columnName));
         }
@@ -150,7 +151,7 @@ public abstract class SectionParser<T> {
     }
 
     public void notifyCompletion() {
-        LOG.debug("Section {} completed", getName());
+        LOG.debug("Section '{}' completed", getName());
         printResume();
     }
 

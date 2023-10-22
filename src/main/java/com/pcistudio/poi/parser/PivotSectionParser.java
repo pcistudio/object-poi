@@ -43,8 +43,8 @@ public class PivotSectionParser<T> extends SectionParser<List<T>> {
                 LOG.debug("Empty line found");
             }
         } catch (Exception exception) {
-            LOG.debug(new Gson().toJson(objectToBuild));
             LOG.error("Error populating object for row {}", getRowCount(), exception);
+            LOG.debug(new Gson().toJson(objectToBuild));
         }
     }
 
@@ -59,8 +59,13 @@ public class PivotSectionParser<T> extends SectionParser<List<T>> {
 
     @Override
     protected void printResume() {
-        LOG.info("HEADERS {}", new Gson().toJson(get()));
+        LOG.info("sectionParser='{}' found {} records", getName(), get().size());
+        if (context.isKeyValue()) {
+            LOG.debug("sectionParser='{}' result={}", getName(), new Gson().toJson(get()));
+        } else {
+            get().stream().limit(10)
+                    .forEach(row -> LOG.debug("{}", new Gson().toJson(row)));
+        }
     }
-
 
 }

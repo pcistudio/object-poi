@@ -16,38 +16,38 @@ public class TableSectionParserBuilder<T> {
 
     private Short columnCount;
 
-    public TableSectionParserBuilder<T> name(String name) {
+    public TableSectionParserBuilder<T> withName(String name) {
         this.name = name;
         return this;
     }
 
-    public TableSectionParserBuilder<T> objectToBuild(List<T> objectToBuild) {
+    public TableSectionParserBuilder<T> withObjectToBuild(List<T> objectToBuild) {
         this.objectToBuild = objectToBuild;
         return this;
     }
 
-    public TableSectionParserBuilder<T> rowStartIndex(int rowStartIndex) {
+    public TableSectionParserBuilder<T> withRowStartIndex(int rowStartIndex) {
         this.rowStartIndex = rowStartIndex;
         return this;
     }
 
-    public TableSectionParserBuilder<T> columnStartIndex(int columnStartIndex) {
+    public TableSectionParserBuilder<T> withColumnStartIndex(int columnStartIndex) {
         this.columnStartIndex = columnStartIndex;
         return this;
     }
 
-    public TableSectionParserBuilder<T> startName(String startName) {
+    public TableSectionParserBuilder<T> withStartName(String startName) {
         this.startName = startName;
         return this;
     }
 
-    public TableSectionParserBuilder<T> recordClass(Class<T> recordClass) {
+    public TableSectionParserBuilder<T> withRecordClass(Class<T> recordClass) {
         this.recordClass = recordClass;
         return this;
     }
 
-    public TableSectionParserBuilder<T> columnCount(short columnCount) {
-        if(columnCount < 1) {
+    public TableSectionParserBuilder<T> withColumnCount(short columnCount) {
+        if(columnCount <= 0) {
             throw new IllegalArgumentException("columnCount min value is 1");
         }
         this.columnCount = columnCount;

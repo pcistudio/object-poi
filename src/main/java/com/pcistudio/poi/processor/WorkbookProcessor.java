@@ -45,11 +45,12 @@ public class WorkbookProcessor {
         this(failIfSheetNotFound, List.of(sheetParsers));
     }
 
-    public Map<String, Object> parseToMap(Path path) {
+    @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
+    public Map<String, Object> parseToMap(Path path) throws IOException {
 
-        try (FileInputStream file = new FileInputStream(path.toFile())) {
+        try (FileInputStream file = new FileInputStream(path.toFile());
+             Workbook workbook = new XSSFWorkbook(file)) {
             Map<String, Object> map = new HashedMap<>();
-            Workbook workbook = new XSSFWorkbook(file);
             if (workbook.getNumberOfSheets() == 0) {
                 throw new IllegalStateException(String.format("Excel file=%s doesn't have any sheet ", path));
             }
@@ -58,19 +59,18 @@ public class WorkbookProcessor {
                 map.put(sheetParser.getSheetName(), sheetResult);
             }
             return map;
-        } catch (IOException ex) {
-            LOG.error("Error parsing file file={}", path, ex);
-            return null;
         }
     }
 
-    public <T> T parseToObject(Path path, Class<T> resultClass) {
+    @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
+    public <T> T parseToObject(Path path, Class<T> resultClass) throws IOException {
 
-        try (FileInputStream file = new FileInputStream(path.toFile())) {
+        try (FileInputStream file = new FileInputStream(path.toFile());
+             Workbook workbook = new XSSFWorkbook(file)) {
             T result = Util.create(resultClass);
             Map<Class<?>, Field> fieldMap = loadSheetFields(resultClass);
             checkAllSheetsHasField(fieldMap);
-            Workbook workbook = new XSSFWorkbook(file);
+
             if (workbook.getNumberOfSheets() == 0) {
                 throw new IllegalStateException(String.format("Excel file=%s doesn't have any sheet ", path));
             }
@@ -80,12 +80,10 @@ public class WorkbookProcessor {
                 set(field, result, sheetResult);
             }
             return result;
-        } catch (IOException ex) {
-            LOG.error("Error parsing file file={}", path, ex);
-            return null;
         }
     }
 
+    @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
     private static <T> void set(Field field, T result, Object sheetResult) {
         try {
             field.setAccessible(true);

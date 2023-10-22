@@ -21,7 +21,7 @@ public class TableSectionParser<ROW> extends SectionParser<List<ROW>> {
     @Override
     public void doFirstRow(Row row) {
         columns = loadColumnsName(row);
-        LOG.info("Found {} columns. {}", columns.length, columns);
+        LOG.info("Found {} columns={}", columns.length, new Gson().toJson(columns));
     }
 
     private String[] loadColumnsName(Row row) {
@@ -31,6 +31,7 @@ public class TableSectionParser<ROW> extends SectionParser<List<ROW>> {
     }
 
     @Override
+    @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     public void doAccept(Row row) {
         int columnIndex = 0;
         Object modelObject = newInstance();
@@ -40,7 +41,7 @@ public class TableSectionParser<ROW> extends SectionParser<List<ROW>> {
         }
         int sectionLastIndex = getSectionLastCellIndex(row);
         for (int i = context.getColumnStartIndex(); i < sectionLastIndex; i++) {
-            Cell cell = row.getCell(i);
+            final Cell cell = row.getCell(i);
             if (columns[columnIndex] != null) {
                 populateRowObject(modelObject, columnIndex, cell);
             } else {
@@ -63,8 +64,8 @@ public class TableSectionParser<ROW> extends SectionParser<List<ROW>> {
 
     @Override
     protected void printResume() {
-        LOG.info("Found {} columns, {} rows", columns.length, get().size());
+        LOG.info("sectionParser='{}' found {} columns, {} rows", getName(), columns.length, get().size());
         get().stream().limit(10)
-                .forEach(row -> LOG.info("{}", new Gson().toJson(row)));
+                .forEach(row -> LOG.debug("{}", new Gson().toJson(row)));
     }
 }

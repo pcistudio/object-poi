@@ -31,11 +31,14 @@ public abstract class ColumnSheetParser<T> implements SheetParser<T> {
         describeSections(result, builder);
         try (SectionParserManager sectionParserManager = builder.build()) {
             describeSections(result, sectionParserManager);
-            int index = 0;
-            for (Row row : sheet) {
-                SectionParser<?> sectionParser = sectionParserManager.get(row, index);
-                sectionParser.accept(row);
-                index++;
+            for (int index = 0; index <= sheet.getLastRowNum(); index++) {
+                Row row = sheet.getRow(index);
+                if (row != null) {
+                    SectionParser<?> sectionParser = sectionParserManager.get(row, index);
+                    sectionParser.accept(row);
+                } else {
+                    LOG.trace("Empty row {}", index);
+                }
             }
             return result;
         }

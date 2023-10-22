@@ -1,6 +1,7 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
+    id 'pmd'
 }
 
 group = 'com.pcistudio'
@@ -18,7 +19,7 @@ publishing {
             pom {
                 name = 'object-poi'
                 description = 'Object Excel Mapping library to help with the parsing of complex excel documents'
-                url = 'https://github.com/ymdomenech/object-poi'
+                url = 'https://github.com/pcistudio/object-poi'
                 licenses {
                     license {
                         name = 'The Apache License, Version 2.0'
@@ -31,12 +32,14 @@ publishing {
 
     repositories {
         maven {
-            url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+//            url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+            url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
             credentials {
                 username = project.findProperty("ossrhUsername") ?: System.getenv("OSSRH_USERNAME")
                 password = project.findProperty("ossrhPassword") ?: System.getenv("OSSRH_PASSWORD")
             }
         }
+
     }
 }
 
@@ -48,6 +51,7 @@ java {
     sourceCompatibility = '11'
     withSourcesJar()
     withJavadocJar()
+
 }
 
 dependencies {
