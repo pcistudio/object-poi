@@ -9,9 +9,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-//TODO Create gradle for library
-//TODO add pluggins for pmd checkstyle and spotbug.
-//TODO create a github project and create the gitactions build
+//TODO add pluggins for pmd checkstyle
+//TODO create the gitactions build
 // Deploy the artifact in maven central
 public class PivotSectionParser<T> extends SectionParser<List<T>> {
     private static final Logger LOG = LoggerFactory.getLogger(PivotSectionParser.class);
