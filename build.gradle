@@ -2,7 +2,7 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'pmd'
-    id 'checkstyle'
+    id "com.github.spotbugs" version "6.0.0-rc.2"
 }
 
 group = 'com.pcistudio'
@@ -75,3 +75,11 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+spotbugs {
+    excludeFilter.set(
+            file("${projectDir}/codequality/bug-filter.xml")
+    )
+}
+
+spotbugsTest.enabled = false

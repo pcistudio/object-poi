@@ -1,5 +1,6 @@
 package com.pcistudio.poi.parser;
 
+import java.util.Collections;
 import java.util.Map;
 
 public class SectionParserContext<T> {
@@ -52,7 +53,7 @@ public class SectionParserContext<T> {
          * @return
          */
         public Builder<T> descriptorMap(Map<String, FieldDescriptor> descriptorMap) {
-            context.map = descriptorMap;
+            context.map = Collections.unmodifiableMap(descriptorMap);
             return this;
         }
 

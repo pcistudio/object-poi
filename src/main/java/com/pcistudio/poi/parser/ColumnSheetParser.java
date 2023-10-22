@@ -1,6 +1,6 @@
 package com.pcistudio.poi.parser;
 
-import com.pcistudio.poi.util.Util;
+import com.pcistudio.poi.util.PoiUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.slf4j.Logger;
@@ -22,7 +22,7 @@ public abstract class ColumnSheetParser<T> implements SheetParser<T> {
     }
 
     private T createSheetObject() {
-        return Util.create(sheetClass());
+        return PoiUtil.create(sheetClass());
     }
 
     public T parse(Sheet sheet) {

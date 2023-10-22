@@ -9,7 +9,7 @@ import java.util.List;
 
 public class SectionParserManager implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(SectionParserManager.class);
-    private List<SectionParser<?>> list = new ArrayList<>();
+    private final List<SectionParser<?>> list = new ArrayList<>();
 
     private SectionParser<?> currentSectionParser = null;
 

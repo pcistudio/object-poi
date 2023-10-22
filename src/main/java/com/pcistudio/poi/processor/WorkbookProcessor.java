@@ -2,7 +2,7 @@ package com.pcistudio.poi.processor;
 
 
 import com.pcistudio.poi.parser.SheetParser;
-import com.pcistudio.poi.util.Util;
+import com.pcistudio.poi.util.PoiUtil;
 import org.apache.commons.collections4.map.HashedMap;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -67,7 +67,7 @@ public class WorkbookProcessor {
 
         try (FileInputStream file = new FileInputStream(path.toFile());
              Workbook workbook = new XSSFWorkbook(file)) {
-            T result = Util.create(resultClass);
+            T result = PoiUtil.create(resultClass);
             Map<Class<?>, Field> fieldMap = loadSheetFields(resultClass);
             checkAllSheetsHasField(fieldMap);
 

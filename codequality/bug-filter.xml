@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <Match>
+        <Class name="com.pcistudio.poi.parser.FieldDescriptor"/>
+        <Bug code="EI,EI2"/>
+    </Match>
+    <!--    TODO maybe I can remove this list because and create it inside the class-->
+    <Match>
+        <Class name="com.pcistudio.poi.parser.TableSectionParserBuilder"/>
+        <Method name="withObjectToBuild" params="java.util.List"
+                returns="com.pcistudio.poi.parser.TableSectionParserBuilder"/>
+        <Bug code="EI2"/>
+    </Match>
+    <Match>
+        <Class name="com.pcistudio.poi.parser.PivotSectionParserBuilder"/>
+        <Method name="withObjectToBuild" params="java.util.List"
+                returns="com.pcistudio.poi.parser.PivotSectionParserBuilder"/>
+        <Bug code="EI2"/>
+    </Match>
+
+    <Match>
+        <Class name="com.pcistudio.poi.parser.PivotSectionParserBuilder"/>
+        <Method name="withObjectToBuild" params="java.util.List"
+                returns="com.pcistudio.poi.parser.PivotSectionParserBuilder"/>
+        <Bug code="EI2"/>
+    </Match>
+    <Match>
+        <Class name="com.pcistudio.poi.parser.SectionParserContext$Builder"/>
+        <Bug code="PI"/>
+    </Match>
+</FindBugsFilter>

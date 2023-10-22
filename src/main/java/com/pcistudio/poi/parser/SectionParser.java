@@ -165,4 +165,9 @@ public abstract class SectionParser<T> {
     protected void printResume() {
 
     }
+
+    @Override
+    @SuppressWarnings("PMD.EmptyFinalizer")
+    protected final void finalize() {
+    }
 }
