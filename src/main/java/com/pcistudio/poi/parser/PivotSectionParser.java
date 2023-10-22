@@ -51,7 +51,7 @@ public class PivotSectionParser<T> extends SectionParser<T> {
     public void doFirstRow(Row row) {
         int sectionLastCellIndex = getSectionLastCellIndex(row);
         for (int i = context.getColumnStartIndex() + 1; i < sectionLastCellIndex; i++) {
-            objectToBuild.add((T) newInstance());
+            objectToBuild.add(newInstance());
         }
         doAccept(row);
     }

@@ -7,8 +7,8 @@ public class Preconditions {
         notEmpty(objects, "objects in allOrNothing cannot be null");
         int notSet = 0;
         int set = 0;
-        for (int i = 0; i < objects.length; i++) {
-            if (objects[i] == null) {
+        for (Object object : objects) {
+            if (object == null) {
                 notSet++;
             } else {
                 set++;

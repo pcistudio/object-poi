@@ -56,7 +56,7 @@ public class TableSectionParserBuilder<T> {
 
 
     public TableSectionParser<T> build() {
-        return new TableSectionParser<T>(name,
+        return new TableSectionParser<>(name,
                 objectToBuild,
                 new SectionParserContext.Builder<T>()
                         .startName(startName)

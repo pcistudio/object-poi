@@ -21,7 +21,7 @@ public abstract class SectionParser<T> {
     private int rowCount = 0;
     private boolean started = false;
 
-    private String name;
+    private final String name;
 
     //TODO see if objectToBuild can be transform to a list<T>
     public SectionParser(String name, List<T> objectToBuild, SectionParserContext<T> context) {
@@ -124,16 +124,12 @@ public abstract class SectionParser<T> {
 
     /**
      * This method should get a excel Row and add some values to the objectToBuild
-     * @param row
+     * @param row excel row
      */
     protected abstract void doAccept(Row row);
 
-    protected Object newInstance() {
-        try {
-            return context.getRecordClass().getConstructor().newInstance();
-        } catch (Exception ex) {
-            return new RuntimeException("Not able to build object type " + context.getRecordClass() + ". Check empty constructor");
-        }
+    protected T newInstance() {
+        return PoiUtil.create(context.getRecordClass());
     }
 
     @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
@@ -141,7 +137,7 @@ public abstract class SectionParser<T> {
         if (StringUtil.isBlank(columnName)) {
            throw new IllegalArgumentException("columnName cannot be null");
         }
-        FieldDescriptor fieldDescriptor = (FieldDescriptor) context.getMap().get(columnName);
+        FieldDescriptor fieldDescriptor = context.getMap().get(columnName);
         if (fieldDescriptor == null) {
             return;
         }

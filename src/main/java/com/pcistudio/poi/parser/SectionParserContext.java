@@ -42,7 +42,7 @@ public class SectionParserContext<T> {
     }
 
     public static class Builder<T> {
-        private SectionParserContext<T> context = new SectionParserContext<>();
+        private final SectionParserContext<T> context = new SectionParserContext<>();
 
         /**
          * descriptorMap allow null when only want to parse the section but don't want to keep the data

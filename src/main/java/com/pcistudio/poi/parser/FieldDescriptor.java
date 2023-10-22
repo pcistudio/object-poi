@@ -50,7 +50,7 @@ public class FieldDescriptor {
     }
 
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
-    public static Map<String, FieldDescriptor> loadFrom(Class columnClass) {
+    public static Map<String, FieldDescriptor> loadFrom(Class<?> columnClass) {
         if (columnClass == null) {
             return new HashMap<>();
         }

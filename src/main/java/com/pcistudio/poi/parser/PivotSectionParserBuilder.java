@@ -62,7 +62,7 @@ public class PivotSectionParserBuilder<T> {
 
     public PivotSectionParser<T> build() {
 
-        return new PivotSectionParser<T>(name,
+        return new PivotSectionParser<>(name,
                 objectToBuild,
                 new SectionParserContext.Builder<T>()
                         .startName(startName)
