@@ -2,6 +2,7 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'pmd'
+    id 'checkstyle'
 }
 
 group = 'com.pcistudio'
