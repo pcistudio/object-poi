@@ -63,7 +63,7 @@ public class TableSectionParserBuilder<T> {
                         .rowStartIndex(rowStartIndex)
                         .columnStartIndex(columnStartIndex)
                         .columnCount(columnCount)
-                        .objectClass(recordClass)
+                        .recordClass(recordClass)
                         .descriptorMap(FieldDescriptor.loadFrom(recordClass))
                         .build()
         );

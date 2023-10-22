@@ -56,8 +56,8 @@ public class PoiUtil {
         return cellStringTrim(cell, "#");
     }
 
-    public static String cellSanitize(Cell cell) {
-        String cellValue = cellStringTrim(cell, "#");
+    public static String cellSanitize(Cell cell, String numberFormat) {
+        String cellValue = cellStringTrim(cell, numberFormat);
         return cellValue == null ? null : cellValue.replaceAll("\n", "");
     }
 
@@ -87,7 +87,7 @@ public class PoiUtil {
         }
         StringBuilder sb = new StringBuilder();
         for (Cell cell: row) {
-            sb.append(cellSanitize(cell));
+            sb.append(cellSanitize(cell, "#.##"));
             sb.append("\t|\t");
         }
         return sb.toString();

@@ -1,6 +1,7 @@
 package com.pcistudio.poi.parser;
 
 import com.pcistudio.poi.util.PoiUtil;
+import com.pcistudio.poi.util.Preconditions;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.util.StringUtil;
@@ -21,10 +22,13 @@ public abstract class SectionParser<T> {
 
     private String name;
 
+    //TODO see if objectToBuild can be transform to a list<T>
     public SectionParser(String name, T objectToBuild, SectionParserContext context) {
         this.name = name;
         this.context = context;
         this.objectToBuild = objectToBuild;
+//
+        Preconditions.allOrNothing("objectToBuild, recordClass must to be set together. Please check builder", objectToBuild, context.getRecordClass());
 //        TODO data will be ignored. Probably remove
         if (this.objectToBuild == null) {
             LOG.warn("Data will be ignored for section={}", name);
@@ -125,9 +129,9 @@ public abstract class SectionParser<T> {
 
     protected Object newInstance() {
         try {
-            return context.getObjectClass().getConstructor().newInstance();
+            return context.getRecordClass().getConstructor().newInstance();
         } catch (Exception ex) {
-            return new RuntimeException("Not able to build object type " + context.getObjectClass() + ". Check empty constructor");
+            return new RuntimeException("Not able to build object type " + context.getRecordClass() + ". Check empty constructor");
         }
     }
 

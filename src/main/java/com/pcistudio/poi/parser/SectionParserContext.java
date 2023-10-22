@@ -8,7 +8,7 @@ public class SectionParserContext<T> {
     private String startName;
 
     private Map<String, FieldDescriptor> map;
-    private Class<T> objectClass;
+    private Class<T> recordClass;
     private int columnStartIndex = 0;
 
     private Short columnCount;
@@ -25,8 +25,8 @@ public class SectionParserContext<T> {
         return map;
     }
 
-    public Class<T> getObjectClass() {
-        return objectClass;
+    public Class<T> getRecordClass() {
+        return recordClass;
     }
 
     public Short getColumnCount() {
@@ -65,8 +65,8 @@ public class SectionParserContext<T> {
          * @param objectClass
          * @return
          */
-        public Builder<T> objectClass(Class<T> objectClass) {
-            context.objectClass = objectClass;
+        public Builder<T> recordClass(Class<T> objectClass) {
+            context.recordClass = objectClass;
             return this;
         }
 

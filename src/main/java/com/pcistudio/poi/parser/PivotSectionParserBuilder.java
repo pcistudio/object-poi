@@ -61,6 +61,7 @@ public class PivotSectionParserBuilder<T> {
     }
 
     public PivotSectionParser<T> build() {
+
         return new PivotSectionParser<T>(name,
                 objectToBuild,
                 new SectionParserContext.Builder<T>()
@@ -68,7 +69,7 @@ public class PivotSectionParserBuilder<T> {
                         .rowStartIndex(rowStartIndex)
                         .columnStartIndex(columnStartIndex)
                         .columnCount(columnCount)
-                        .objectClass(recordClass)
+                        .recordClass(recordClass)
                         .descriptorMap(FieldDescriptor.loadFrom(recordClass))
                         .build()
         );
