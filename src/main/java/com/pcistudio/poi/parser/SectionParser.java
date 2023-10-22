@@ -23,7 +23,6 @@ public abstract class SectionParser<T> {
 
     private final String name;
 
-    //TODO see if objectToBuild can be transform to a list<T>
     public SectionParser(String name, List<T> objectToBuild, SectionParserContext<T> context) {
         this.name = name;
         this.context = context;

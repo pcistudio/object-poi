@@ -34,7 +34,7 @@ public class TableSectionParser<ROW> extends SectionParser<ROW> {
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     public void doAccept(Row row) {
         int columnIndex = 0;
-        Object modelObject = newInstance();
+        ROW modelObject = newInstance();
         //TODO Remove this if
         if (row.getCell(context.getColumnStartIndex()) == null) {
             return;
@@ -51,7 +51,7 @@ public class TableSectionParser<ROW> extends SectionParser<ROW> {
         }
 
         //noinspection unchecked
-        objectToBuild.add((ROW) modelObject);
+        objectToBuild.add(modelObject);
     }
 
     private void populateRowObject(Object rowObject, int columnIndex, Cell valueCell) {
