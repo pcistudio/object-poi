@@ -25,6 +25,10 @@
         <Bug code="EI2"/>
     </Match>
     <Match>
+        <Class name="com.pcistudio.poi.parser.SectionParser"/>
+        <Bug code="EI2"/>
+    </Match>
+    <Match>
         <Or>
             <Class name="com.pcistudio.poi.parser.SectionParserContext$Builder"/>
             <Class name="com.pcistudio.poi.util.Preconditions"/>

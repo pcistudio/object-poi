@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
-public class TableSectionParser<ROW> extends SectionParser<List<ROW>> {
+public class TableSectionParser<ROW> extends SectionParser<ROW> {
     private static final Logger LOG = LoggerFactory.getLogger(TableSectionParser.class);
     private String[] columns;
 

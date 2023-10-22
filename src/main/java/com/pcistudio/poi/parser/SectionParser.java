@@ -9,13 +9,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
+import java.util.List;
 
 public abstract class SectionParser<T> {
     private static final Logger LOG = LoggerFactory.getLogger(SectionParser.class);
 
-    protected final SectionParserContext context;
+    protected final SectionParserContext<T> context;
 
-    protected final T objectToBuild;
+    protected final List<T> objectToBuild;
 
     private int rowCount = 0;
     private boolean started = false;
@@ -23,7 +24,7 @@ public abstract class SectionParser<T> {
     private String name;
 
     //TODO see if objectToBuild can be transform to a list<T>
-    public SectionParser(String name, T objectToBuild, SectionParserContext context) {
+    public SectionParser(String name, List<T> objectToBuild, SectionParserContext<T> context) {
         this.name = name;
         this.context = context;
         this.objectToBuild = objectToBuild;
@@ -95,7 +96,7 @@ public abstract class SectionParser<T> {
         }
     }
 
-    public T get() {
+    protected List<T> get() {
         return objectToBuild;
     }
 

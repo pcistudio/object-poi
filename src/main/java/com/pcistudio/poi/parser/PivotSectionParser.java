@@ -12,7 +12,7 @@ import java.util.List;
 //TODO add pluggins for pmd checkstyle
 //TODO create the gitactions build
 // Deploy the artifact in maven central
-public class PivotSectionParser<T> extends SectionParser<List<T>> {
+public class PivotSectionParser<T> extends SectionParser<T> {
     private static final Logger LOG = LoggerFactory.getLogger(PivotSectionParser.class);
 
     protected PivotSectionParser(String name, List<T> objectToBuild, SectionParserContext<T> context) {
