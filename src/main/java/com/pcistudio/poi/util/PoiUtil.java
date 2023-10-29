@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.util.Objects;
@@ -57,11 +58,16 @@ public class PoiUtil {
     }
 
     public static void dumpSheet(Path path, String sheetName) throws IOException {
-        try (FileInputStream file = new FileInputStream(path.toFile());
-             Workbook workbook = new XSSFWorkbook(file)) {
+        try (FileInputStream file = new FileInputStream(path.toFile())) {
+            dumpSheet(file, sheetName);
+        }
+    }
+
+    public static void dumpSheet(InputStream inputStream, String sheetName) throws IOException {
+        try (Workbook workbook = new XSSFWorkbook(inputStream)) {
 
             if (workbook.getNumberOfSheets() == 0) {
-                throw new IllegalStateException(String.format("Excel file=%s doesn't have any sheet ", path));
+                throw new IllegalStateException("Excel doesn't have any sheet ");
             }
 
             Sheet sheet = workbook.getSheet(sheetName);
@@ -70,9 +76,8 @@ public class PoiUtil {
             for (int index = 0; index <= sheet.getLastRowNum(); index++) {
                 Row row = sheet.getRow(index);
                 String rowdata = buildRow(row);
-                LOG.debug("{}. | {}", index+1, rowdata);
+                LOG.debug("{}. | {}", index + 1, rowdata);
             }
-
         }
     }
 
@@ -81,7 +86,7 @@ public class PoiUtil {
             return "";
         }
         StringBuilder sb = new StringBuilder();
-        for (Cell cell: row) {
+        for (Cell cell : row) {
             sb.append(cellSanitize(cell, "#.##"));
             sb.append("\t|\t");
         }

@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class SectionParserContext<T> {
     private int rowStartIndex = -1;
-    private String startName;
+    private String startValue;
 
     private Map<String, FieldDescriptor> map;
     private Class<T> recordClass;
@@ -17,8 +17,8 @@ public class SectionParserContext<T> {
         return rowStartIndex;
     }
 
-    public String getStartName() {
-        return startName;
+    public String getStartValue() {
+        return startValue;
     }
 
     public Map<String, FieldDescriptor> getMap() {
@@ -88,8 +88,8 @@ public class SectionParserContext<T> {
             return this;
         }
 
-        public Builder<T> startName(String startName) {
-            context.startName = startName;
+        public Builder<T> startValue(String startValue) {
+            context.startValue = startValue;
             return this;
         }
 

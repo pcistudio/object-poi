@@ -33,8 +33,8 @@ public abstract class SectionParser<T> {
         if (this.objectToBuild == null) {
             LOG.warn("Data will be ignored for section={}", name);
         }
-        if (isStartIndexNotSet() && isStartNameNotSet()) {
-            throw new IllegalStateException("Section startIndex and startName are both undefined. You need to set at least one");
+        if (isStartIndexNotSet() && isStartValueNotSet()) {
+            throw new IllegalStateException("Section startIndex and startValue are both undefined. You need to set at least one");
         }
     }
 
@@ -54,16 +54,16 @@ public abstract class SectionParser<T> {
         return context.getRowStartIndex() < 0;
     }
 
-    private boolean isStartNameNotSet() {
-        return StringUtil.isBlank(context.getStartName());
+    private boolean isStartValueNotSet() {
+        return StringUtil.isBlank(context.getStartValue());
     }
 
     private boolean isStartIndexSet() {
         return !isStartIndexNotSet();
     }
 
-    private boolean isStartNameSet() {
-        return !isStartNameNotSet();
+    private boolean isStartValueSet() {
+        return !isStartValueNotSet();
     }
 
     public boolean sectionStartedByIndex(int rowIndex) {
@@ -71,7 +71,7 @@ public abstract class SectionParser<T> {
     }
 
     public boolean sectionStartedByName(String cellValue) {
-        return context.getStartName().equals(cellValue);
+        return context.getStartValue().equals(cellValue);
     }
 
     public boolean isActive(Row row, int rowIndex) {
@@ -86,7 +86,7 @@ public abstract class SectionParser<T> {
     }
 
     private boolean isActive(Cell cell, int rowIndex) {
-        if (isStartNameSet() && isStartIndexSet()) {
+        if (isStartValueSet() && isStartIndexSet()) {
             return sectionStartedByIndex(rowIndex) && sectionStartedByName(PoiUtil.cellStringTrim(cell));
         } else if (isStartIndexSet()) {
             return sectionStartedByIndex(rowIndex);

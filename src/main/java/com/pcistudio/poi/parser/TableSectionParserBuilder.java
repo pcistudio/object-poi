@@ -10,7 +10,7 @@ public class TableSectionParserBuilder<T> {
 
     private int columnStartIndex = 0;
 
-    private String startName;
+    private String startValue;
 
     private Class<T> recordClass;
 
@@ -36,8 +36,8 @@ public class TableSectionParserBuilder<T> {
         return this;
     }
 
-    public TableSectionParserBuilder<T> withStartName(String startName) {
-        this.startName = startName;
+    public TableSectionParserBuilder<T> withStartValue(String startValue) {
+        this.startValue = startValue;
         return this;
     }
 
@@ -59,7 +59,7 @@ public class TableSectionParserBuilder<T> {
         return new TableSectionParser<>(name,
                 objectToBuild,
                 new SectionParserContext.Builder<T>()
-                        .startName(startName)
+                        .startValue(startValue)
                         .rowStartIndex(rowStartIndex)
                         .columnStartIndex(columnStartIndex)
                         .columnCount(columnCount)

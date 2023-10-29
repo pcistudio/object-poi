@@ -14,7 +14,7 @@ public class PivotSectionParserBuilder<T> {
 
     private Short columnCount;
 
-    private String startName;
+    private String startValue;
 
     private Class<T> recordClass;
 
@@ -28,8 +28,8 @@ public class PivotSectionParserBuilder<T> {
         return this;
     }
 
-    public PivotSectionParserBuilder<T> withStartName(String startName) {
-        this.startName = startName;
+    public PivotSectionParserBuilder<T> withStartValue(String startValue) {
+        this.startValue = startValue;
         return this;
     }
 
@@ -65,7 +65,7 @@ public class PivotSectionParserBuilder<T> {
         return new PivotSectionParser<>(name,
                 objectToBuild,
                 new SectionParserContext.Builder<T>()
-                        .startName(startName)
+                        .startValue(startValue)
                         .rowStartIndex(rowStartIndex)
                         .columnStartIndex(columnStartIndex)
                         .columnCount(columnCount)

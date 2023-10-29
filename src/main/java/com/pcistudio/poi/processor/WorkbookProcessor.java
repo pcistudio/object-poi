@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -62,17 +63,22 @@ public class WorkbookProcessor {
         }
     }
 
-    @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
-    public <T> T parseToObject(Path path, Class<T> resultClass) throws IOException {
 
-        try (FileInputStream file = new FileInputStream(path.toFile());
-             Workbook workbook = new XSSFWorkbook(file)) {
+    public <T> T parseToObject(Path path, Class<T> resultClass) throws IOException {
+        try (InputStream inputStream = new FileInputStream(path.toFile())) {
+            return parseToObject(inputStream, resultClass);
+        }
+    }
+
+    @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
+    public <T> T parseToObject(InputStream inputStream, Class<T> resultClass) throws IOException {
+        try (Workbook workbook = new XSSFWorkbook(inputStream)) {
             T result = PoiUtil.create(resultClass);
             Map<Class<?>, Field> fieldMap = loadSheetFields(resultClass);
             checkAllSheetsHasField(fieldMap);
 
             if (workbook.getNumberOfSheets() == 0) {
-                throw new IllegalStateException(String.format("Excel file=%s doesn't have any sheet ", path));
+                throw new IllegalStateException("Excel doesn't have any sheet");
             }
             for (SheetParser<?> sheetParser : sheetParsers) {
                 Object sheetResult = parseSheet(workbook, sheetParser);
