@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.ParameterizedType;
+import java.util.Objects;
 
 public abstract class ColumnSheetParser<T> implements SheetParser<T> {
 
@@ -41,6 +42,31 @@ public abstract class ColumnSheetParser<T> implements SheetParser<T> {
                 }
             }
             return result;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public void write(Sheet sheet, Object objToWrite) {
+        Objects.requireNonNull(objToWrite, "Trying to write a null object");
+        if(objToWrite.getClass() != sheetClass()) {
+            throw new IllegalArgumentException(String.format("Trying to write a type %s in a sheetClass=%s", objToWrite.getClass(), sheetClass()));
+        }
+
+        SectionParserManagerBuilder builder = new SectionParserManagerBuilder();
+        describeSections((T)objToWrite, builder);
+        try (SectionParserManager sectionParserManager = builder.build()) {
+            describeSections((T)objToWrite, sectionParserManager);
+            sectionParserManager.write(sheet);//here the objToWrite is not needed because the is already set
+//            for (int index = 0; index <= sheet.getLastRowNum(); index++) {
+//                Row row = sheet.getRow(index);
+//                if (row != null) {
+//                    SectionParser<?> sectionParser =
+//                    sectionParser.accept(row);
+//                } else {
+//                    LOG.trace("Empty row {}", index);
+//                }
+//            }
+//            return result;
         }
     }
 

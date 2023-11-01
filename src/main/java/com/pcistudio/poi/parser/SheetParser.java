@@ -5,6 +5,8 @@ import org.apache.poi.ss.usermodel.Sheet;
 public interface SheetParser<T> {
     T parse(Sheet sheet);
 
+    void write(Sheet sheet, Object objToWrite);
+
     String getSheetName();
 
     default void checkSheetName(Sheet sheet) {

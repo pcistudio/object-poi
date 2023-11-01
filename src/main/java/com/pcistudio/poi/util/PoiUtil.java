@@ -1,5 +1,7 @@
 package com.pcistudio.poi.util;
 
+import com.google.gson.internal.Primitives;
+import com.pcistudio.poi.parser.FieldDescriptor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -11,8 +13,13 @@ import org.slf4j.LoggerFactory;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Objects;
 
 public class PoiUtil {
@@ -98,6 +105,43 @@ public class PoiUtil {
             return clazz.getConstructor().newInstance();
         } catch (Exception e) {
             throw new RuntimeException("Error creating object from class " + clazz.getName() + ". Check for default constructor", e);
+        }
+    }
+
+    public static void fillCell(Cell cell, FieldDescriptor fieldDescriptor, Object obj) {
+        //TODO: at some point add a format support and ad formula support can not be set with the native support example SUM(E5:E6)
+        // Looks like formula will complicate this a lot
+        // Possible solution pre-calculate formulas before calling the write to excel
+        Objects.requireNonNull(obj, "object cannot by null");
+        Class<?> type = fieldDescriptor.getFieldWrapType();
+
+        Object fieldValue = retrieveFieldValue(fieldDescriptor.getField(), obj);
+        if (fieldValue == null) {
+            return;
+        }
+
+        if (Number.class.isAssignableFrom(type)) {
+            cell.setCellValue(((Number) fieldValue).doubleValue());
+        } else if (Date.class.isAssignableFrom(type)) {
+            cell.setCellValue((Date) fieldValue);
+        } else if (LocalDateTime.class.isAssignableFrom(type)) {
+            cell.setCellValue((LocalDateTime) fieldValue);
+        } else if (LocalDate.class.isAssignableFrom(type)) {
+            cell.setCellValue((LocalDate) fieldValue);
+        } else if (Calendar.class.isAssignableFrom(type)) {
+            cell.setCellValue((Calendar) fieldValue);
+        } else {
+            cell.setCellValue(String.valueOf(fieldValue));
+        }
+    }
+
+
+    public static Object retrieveFieldValue(Field field, Object obj) {
+        try {
+            field.setAccessible(true);
+            return field.get(obj);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(String.format("Error getting field=%s from class=%s", field.getName(), obj.getClass().getCanonicalName()), e);
         }
     }
 }

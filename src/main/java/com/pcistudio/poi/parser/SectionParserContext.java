@@ -53,6 +53,7 @@ public class SectionParserContext<T> {
          * @return
          */
         public Builder<T> descriptorMap(Map<String, FieldDescriptor> descriptorMap) {
+
             context.map = Collections.unmodifiableMap(descriptorMap);
             return this;
         }

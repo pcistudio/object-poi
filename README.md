@@ -140,7 +140,7 @@ public class RevenueColumnSheetParser extends ColumnSheetParser<CarRentalRevenue
     }
 }
 ```
-
+TODO: Missing the explanation for how the library chose the sheetname to read
 ```java
 import com.pcistudio.poi.processor.WorkbookProcessor;
 ...
@@ -149,3 +149,10 @@ public static void main(String[]args){
 }
 
 ```
+
+------------------------
+
+> Note: This version don't support formula at writing time just at reading. 
+> Any value that needs come from formulas need to be pre-calculated.
+
+

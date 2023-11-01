@@ -14,6 +14,8 @@ public class TableSectionParserBuilder<T> {
 
     private Class<T> recordClass;
 
+    //TODO it doesn't look look like it make sence bc the property list for the object already have a columnCount
+    // in the pivot it makes sence
     private Short columnCount;
 
     public TableSectionParserBuilder<T> withName(String name) {

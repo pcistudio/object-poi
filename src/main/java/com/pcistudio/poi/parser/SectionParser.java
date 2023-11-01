@@ -2,15 +2,20 @@ package com.pcistudio.poi.parser;
 
 import com.pcistudio.poi.util.PoiUtil;
 import com.pcistudio.poi.util.Preconditions;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
-import java.util.List;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
 
+/**
+ * This class needs to be new every time that you are trying to use it because it is stateful
+ * @param <T>
+ */
 public abstract class SectionParser<T> {
     private static final Logger LOG = LoggerFactory.getLogger(SectionParser.class);
 
@@ -50,7 +55,7 @@ public abstract class SectionParser<T> {
         return started;
     }
 
-    private boolean isStartIndexNotSet() {
+    protected boolean isStartIndexNotSet() {
         return context.getRowStartIndex() < 0;
     }
 
@@ -58,7 +63,7 @@ public abstract class SectionParser<T> {
         return StringUtil.isBlank(context.getStartValue());
     }
 
-    private boolean isStartIndexSet() {
+    protected boolean isStartIndexSet() {
         return !isStartIndexNotSet();
     }
 
@@ -78,7 +83,7 @@ public abstract class SectionParser<T> {
         if (started) {
             return true;
         }
-        started = isActive(row.getCell(0), rowIndex);
+        started = isActive(row.getCell(context.getColumnStartIndex()), rowIndex);
         if (started) {
             LOG.debug("Selected sectionParser='{}' in row={}", getName(), rowIndex);
         }
@@ -132,7 +137,7 @@ public abstract class SectionParser<T> {
     }
 
     @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
-    protected void populateRowObject(Object modelObject, String columnName, Cell valueCell) throws IllegalAccessException {
+    protected void populateObjectFromRow(Object modelObject, String columnName, Cell valueCell) throws IllegalAccessException {
         if (StringUtil.isBlank(columnName)) {
            throw new IllegalArgumentException("columnName cannot be null");
         }
@@ -170,4 +175,22 @@ public abstract class SectionParser<T> {
     @SuppressWarnings("PMD.EmptyFinalizer")
     protected final void finalize() {
     }
+
+    /**
+     * Write to the sheet and return the count of records written
+      * @param sheet
+     * @param lastIndexWritten last row written, useful to check that we are not overriding written
+     * @return count of records written
+     */
+    //TODO check if lastIndexWritten can come from the sheet
+    public abstract int write(Sheet sheet, int lastIndexWritten);
+
+    Set<Class<?>> cellSuppportedClass = Set.of(String.class, Date.class, LocalDateTime.class, LocalDate.class, Calendar.class);
+
+
+    @Override
+    public String toString() {
+        return String.format("%s[%s]", getClass().getName(), getName());
+    }
+
 }

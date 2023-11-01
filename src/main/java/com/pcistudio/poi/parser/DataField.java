@@ -10,4 +10,6 @@ public @interface DataField {
     String format() default "";
 
     boolean required() default false;
+
+    int order() default Integer.MAX_VALUE;
 }

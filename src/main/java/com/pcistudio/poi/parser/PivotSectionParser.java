@@ -2,14 +2,16 @@ package com.pcistudio.poi.parser;
 
 import com.google.gson.Gson;
 import com.pcistudio.poi.util.PoiUtil;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-//TODO add pluggins for pmd checkstyle
+//TODO add pluggins for checkstyle
 //TODO create the gitactions build
 // Deploy the artifact in maven central
 public class PivotSectionParser<T> extends SectionParser<T> {
@@ -36,7 +38,7 @@ public class PivotSectionParser<T> extends SectionParser<T> {
                 int sectionLastCellIndex = getSectionLastCellIndex(row);
                 int firstValue = context.getColumnStartIndex() + 1;
                 for (int i = firstValue; i < sectionLastCellIndex; i++) {
-                    populateRowObject(objectToBuild.get(i - firstValue), columnName, row.getCell(i));
+                    populateObjectFromRow(objectToBuild.get(i - firstValue), columnName, row.getCell(i));
                 }
             } else {
                 LOG.debug("Empty line found");
@@ -66,5 +68,51 @@ public class PivotSectionParser<T> extends SectionParser<T> {
                     .forEach(row -> LOG.debug("{}", new Gson().toJson(row)));
         }
     }
+
+    @Override
+    //FIXME until now this is design to only write by row. Can not have sections next to each other
+    // to have that we need and object that keep track of the lastRowWritten and lastColumn
+    // in the builder we will need sameRow() or nextRow() functions
+    // and in the SectionParser we will need a some properties that tell the writer to write in the next row or in the same row.
+    public int write(Sheet sheet, int lastIndexWritten) {
+        if (isStartIndexSet() && sectionStartedByIndex(lastIndexWritten)) {
+            throw new IllegalStateException(String.format("About to override row %s with sheet %s. " +
+                    "Check that previous section is not bigger than expected. " +
+                    "For dynamic size better use startName property", context.getRowStartIndex(), sheet.getSheetName()));
+        }
+        if (objectToBuild == null) {
+            LOG.warn("Ignoring section={} in sheet={}", getName(), sheet.getSheetName());
+            return 0;
+        }
+        int startRowIndex = isStartIndexNotSet() ? lastIndexWritten + 1 : context.getRowStartIndex();
+
+        writeColumnNames(sheet, startRowIndex);
+        for (int i = 0; i < objectToBuild.size(); i++) {
+            T obj = objectToBuild.get(i);
+            writeColumnData(sheet, startRowIndex, context.getColumnStartIndex() + 1 + i,  obj);
+        }
+        return startRowIndex + context.getMap().size();
+    }
+    //TODO-0 Test that multiple sections in the same row work for read
+    private void writeColumnNames(Sheet sheet, int rowStartIndex) {
+        int cellIndex = context.getColumnStartIndex();
+        for(FieldDescriptor fieldDescriptor: context.getMap().values()) {
+            Row row = sheet.createRow(rowStartIndex++);
+            LOG.debug("Created row={} in sheet={}", rowStartIndex, sheet.getSheetName());
+            Cell cell = row.createCell(cellIndex);
+            cell.setCellValue(fieldDescriptor.getName());
+        }
+    }
+
+    private void writeColumnData(Sheet sheet, int rowStartIndex, int columnStartIndex,T obj) {
+        LOG.debug("Writing in sheet={}, starting at row=[{}:{}], with column={}",
+                sheet.getSheetName(), rowStartIndex, rowStartIndex + context.getMap().size(), columnStartIndex);
+        for (FieldDescriptor fieldDescriptor: context.getMap().values()) {
+            Row row = sheet.getRow(rowStartIndex++);
+            Cell cell = row.createCell(columnStartIndex);
+            PoiUtil.fillCell(cell, fieldDescriptor, obj);
+        }
+    }
+
 
 }
