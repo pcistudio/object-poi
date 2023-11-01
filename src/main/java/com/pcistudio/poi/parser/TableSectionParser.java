@@ -71,24 +71,24 @@ public class TableSectionParser<ROW_MODEL> extends SectionParser<ROW_MODEL> {
     }
 
     @Override
-    public int write(Sheet sheet, int lastIndexWritten) {
-        if (isStartIndexSet() && sectionStartedByIndex(lastIndexWritten)) {
+    public int write(Sheet sheet, int nextIndex) {
+        if (isStartIndexSet() && willOverrideData(nextIndex)) {
             throw new IllegalStateException(String.format("About to override row %s with sheet %s. " +
                     "Check that previous section is not bigger than expected. " +
                     "For dynamic size better use startName property", context.getRowStartIndex(), sheet.getSheetName()));
         }
-        //TODO: in this line "lastIndexWritten + 1" the 1 could be a configuration with the space between sections
-        // in this example there is no space (lastIndexWritten + 1 + spaceBetweenSection)
+        //TODO: in this line "nextIndex + 1" the 1 could be a configuration with the space between sections
+        // in this example there is no space (nextIndex + spaceBetweenSection)
         // Create a context class to manage this numbers(SheetCursor) and the actual context should name a sectionDescriptor
         // Same for Pivot
-        int startRowIndex = isStartIndexNotSet() ? lastIndexWritten + 1 : context.getRowStartIndex();
+        int startRowIndex = isStartIndexNotSet() ? nextIndex : context.getRowStartIndex();
 
         writeColumns(sheet, startRowIndex);
         for (int i = 0; i < objectToBuild.size(); i++) {
             ROW_MODEL obj = objectToBuild.get(i);
             writeRow(sheet, startRowIndex + 1 + i,  obj);
         }
-        return startRowIndex + objectToBuild.size() + 1;
+        return startRowIndex + 1 + objectToBuild.size();
     }
 
     private void writeColumns(Sheet sheet, int rowStartIndex) {

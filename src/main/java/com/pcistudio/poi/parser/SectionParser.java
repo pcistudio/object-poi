@@ -8,8 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -74,6 +72,11 @@ public abstract class SectionParser<T> {
     public boolean sectionStartedByIndex(int rowIndex) {
         return rowIndex >= context.getRowStartIndex();
     }
+
+    public boolean willOverrideData(int nextIndex) {
+        return nextIndex > context.getRowStartIndex();
+    }
+
 
     public boolean sectionStartedByName(String cellValue) {
         return context.getStartValue().equals(cellValue);
@@ -179,14 +182,11 @@ public abstract class SectionParser<T> {
     /**
      * Write to the sheet and return the count of records written
       * @param sheet
-     * @param lastIndexWritten last row written, useful to check that we are not overriding written
+     * @param nextIndex last row written, useful to check that we are not overriding written
      * @return count of records written
      */
-    //TODO check if lastIndexWritten can come from the sheet
-    public abstract int write(Sheet sheet, int lastIndexWritten);
-
-    Set<Class<?>> cellSuppportedClass = Set.of(String.class, Date.class, LocalDateTime.class, LocalDate.class, Calendar.class);
-
+    //TODO check if nextIndex can come from the sheet
+    public abstract int write(Sheet sheet, int nextIndex);
 
     @Override
     public String toString() {

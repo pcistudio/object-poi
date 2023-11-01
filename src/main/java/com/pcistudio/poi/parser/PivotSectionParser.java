@@ -74,8 +74,8 @@ public class PivotSectionParser<T> extends SectionParser<T> {
     // to have that we need and object that keep track of the lastRowWritten and lastColumn
     // in the builder we will need sameRow() or nextRow() functions
     // and in the SectionParser we will need a some properties that tell the writer to write in the next row or in the same row.
-    public int write(Sheet sheet, int lastIndexWritten) {
-        if (isStartIndexSet() && sectionStartedByIndex(lastIndexWritten)) {
+    public int write(Sheet sheet, int nextIndex) {
+        if (isStartIndexSet() && willOverrideData(nextIndex)) {
             throw new IllegalStateException(String.format("About to override row %s with sheet %s. " +
                     "Check that previous section is not bigger than expected. " +
                     "For dynamic size better use startName property", context.getRowStartIndex(), sheet.getSheetName()));
@@ -84,13 +84,14 @@ public class PivotSectionParser<T> extends SectionParser<T> {
             LOG.warn("Ignoring section={} in sheet={}", getName(), sheet.getSheetName());
             return 0;
         }
-        int startRowIndex = isStartIndexNotSet() ? lastIndexWritten + 1 : context.getRowStartIndex();
+        int startRowIndex = isStartIndexNotSet() ? nextIndex : context.getRowStartIndex();
 
         writeColumnNames(sheet, startRowIndex);
         for (int i = 0; i < objectToBuild.size(); i++) {
             T obj = objectToBuild.get(i);
             writeColumnData(sheet, startRowIndex, context.getColumnStartIndex() + 1 + i,  obj);
         }
+        LOG.info("Section={} from sheet={} completed with {} rows", getName(), sheet.getSheetName(), objectToBuild.size());
         return startRowIndex + context.getMap().size();
     }
     //TODO-0 Test that multiple sections in the same row work for read
