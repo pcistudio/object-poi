@@ -45,3 +45,4 @@ bin/
 src/test/
 
 test-*.xlsx
+~$test-*.xlsx
