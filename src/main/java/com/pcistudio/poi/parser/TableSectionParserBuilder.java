@@ -60,7 +60,7 @@ public class TableSectionParserBuilder<T> {
     public TableSectionParser<T> build() {
         return new TableSectionParser<>(name,
                 objectToBuild,
-                new SectionParserContext.Builder<T>()
+                new SectionDescriptor.Builder<T>()
                         .startValue(startValue)
                         .rowStartIndex(rowStartIndex)
                         .columnStartIndex(columnStartIndex)

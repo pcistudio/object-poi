@@ -17,7 +17,7 @@ import java.util.*;
 public abstract class SectionParser<T> {
     private static final Logger LOG = LoggerFactory.getLogger(SectionParser.class);
 
-    protected final SectionParserContext<T> context;
+    protected final SectionDescriptor<T> context;
 
     protected final List<T> objectToBuild;
 
@@ -26,7 +26,7 @@ public abstract class SectionParser<T> {
 
     private final String name;
 
-    public SectionParser(String name, List<T> objectToBuild, SectionParserContext<T> context) {
+    public SectionParser(String name, List<T> objectToBuild, SectionDescriptor<T> context) {
         this.name = name;
         this.context = context;
         this.objectToBuild = objectToBuild;

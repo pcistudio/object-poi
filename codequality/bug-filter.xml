@@ -30,7 +30,7 @@
     </Match>
     <Match>
         <Or>
-            <Class name="com.pcistudio.poi.parser.SectionParserContext$Builder"/>
+            <Class name="com.pcistudio.poi.parser.SectionDescriptor$Builder"/>
             <Class name="com.pcistudio.poi.util.Preconditions"/>
         </Or>
         <Bug code="PI"/>

@@ -64,7 +64,7 @@ public class PivotSectionParserBuilder<T> {
 
         return new PivotSectionParser<>(name,
                 objectToBuild,
-                new SectionParserContext.Builder<T>()
+                new SectionDescriptor.Builder<T>()
                         .startValue(startValue)
                         .rowStartIndex(rowStartIndex)
                         .columnStartIndex(columnStartIndex)

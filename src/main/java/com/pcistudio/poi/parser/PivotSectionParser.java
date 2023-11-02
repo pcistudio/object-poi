@@ -17,7 +17,7 @@ import java.util.List;
 public class PivotSectionParser<T> extends SectionParser<T> {
     private static final Logger LOG = LoggerFactory.getLogger(PivotSectionParser.class);
 
-    protected PivotSectionParser(String name, List<T> objectToBuild, SectionParserContext<T> context) {
+    protected PivotSectionParser(String name, List<T> objectToBuild, SectionDescriptor<T> context) {
         super(name, objectToBuild, context);
     }
 

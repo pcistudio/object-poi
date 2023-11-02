@@ -3,7 +3,7 @@ package com.pcistudio.poi.parser;
 import java.util.Collections;
 import java.util.Map;
 
-public class SectionParserContext<T> {
+public class SectionDescriptor<T> {
     private int rowStartIndex = -1;
     private String startValue;
 
@@ -42,7 +42,7 @@ public class SectionParserContext<T> {
     }
 
     public static class Builder<T> {
-        private final SectionParserContext<T> context = new SectionParserContext<>();
+        private final SectionDescriptor<T> context = new SectionDescriptor<>();
 
         /**
          * descriptorMap allow null when only want to parse the section but don't want to keep the data
@@ -94,7 +94,7 @@ public class SectionParserContext<T> {
             return this;
         }
 
-        public SectionParserContext<T> build() {
+        public SectionDescriptor<T> build() {
             return context;
         }
     }

@@ -15,7 +15,7 @@ public class TableSectionParser<ROW_MODEL> extends SectionParser<ROW_MODEL> {
     private static final Logger LOG = LoggerFactory.getLogger(TableSectionParser.class);
     private String[] columns;
 
-    protected TableSectionParser(String name, List<ROW_MODEL> objectToBuild, SectionParserContext<ROW_MODEL> context) {
+    protected TableSectionParser(String name, List<ROW_MODEL> objectToBuild, SectionDescriptor<ROW_MODEL> context) {
         super(name, objectToBuild, context);
     }
 
