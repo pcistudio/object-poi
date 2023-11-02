@@ -33,10 +33,10 @@ public class PivotSectionParser<T> extends SectionParser<T> {
     @Override
     public void doAccept(Row row) {
         try {
-            String columnName = PoiUtil.cellStringTrim(row.getCell(context.getColumnStartIndex()));
+            String columnName = PoiUtil.cellStringTrim(row.getCell(sectionDescriptor.getColumnStartIndex()));
             if (StringUtil.isNotBlank(columnName)) {
                 int sectionLastCellIndex = getSectionLastCellIndex(row);
-                int firstValue = context.getColumnStartIndex() + 1;
+                int firstValue = sectionDescriptor.getColumnStartIndex() + 1;
                 for (int i = firstValue; i < sectionLastCellIndex; i++) {
                     populateObjectFromRow(objectToBuild.get(i - firstValue), columnName, row.getCell(i));
                 }
@@ -52,7 +52,7 @@ public class PivotSectionParser<T> extends SectionParser<T> {
     @Override
     public void doFirstRow(Row row) {
         int sectionLastCellIndex = getSectionLastCellIndex(row);
-        for (int i = context.getColumnStartIndex() + 1; i < sectionLastCellIndex; i++) {
+        for (int i = sectionDescriptor.getColumnStartIndex() + 1; i < sectionLastCellIndex; i++) {
             objectToBuild.add(newInstance());
         }
         doAccept(row);
@@ -61,7 +61,7 @@ public class PivotSectionParser<T> extends SectionParser<T> {
     @Override
     protected void printResume() {
         LOG.info("sectionParser='{}' found {} records", getName(), get().size());
-        if (context.isKeyValue()) {
+        if (sectionDescriptor.isKeyValue()) {
             LOG.debug("sectionParser='{}' result={}", getName(), new Gson().toJson(get()));
         } else {
             get().stream().limit(10)
@@ -74,30 +74,32 @@ public class PivotSectionParser<T> extends SectionParser<T> {
     // to have that we need and object that keep track of the lastRowWritten and lastColumn
     // in the builder we will need sameRow() or nextRow() functions
     // and in the SectionParser we will need a some properties that tell the writer to write in the next row or in the same row.
-    public int write(Sheet sheet, int nextIndex) {
-        if (isStartIndexSet() && willOverrideData(nextIndex)) {
+    public void write(Sheet sheet, SheetCursor cursor) {
+        cursor.setSectionDescriptor(sectionDescriptor);
+        if (cursor.willOverrideData()) {
             throw new IllegalStateException(String.format("About to override row %s with sheet %s. " +
                     "Check that previous section is not bigger than expected. " +
-                    "For dynamic size better use startName property", context.getRowStartIndex(), sheet.getSheetName()));
+                    "For dynamic size better use startName property", sectionDescriptor.getRowStartIndex(), sheet.getSheetName()));
         }
         if (objectToBuild == null) {
             LOG.warn("Ignoring section={} in sheet={}", getName(), sheet.getSheetName());
-            return 0;
         }
-        int startRowIndex = isStartIndexNotSet() ? nextIndex : context.getRowStartIndex();
 
-        writeColumnNames(sheet, startRowIndex);
+        writeColumnNames(sheet, cursor.nextRowStartIndex());
+        cursor.increaseColIndex();
         for (int i = 0; i < objectToBuild.size(); i++) {
             T obj = objectToBuild.get(i);
-            writeColumnData(sheet, startRowIndex, context.getColumnStartIndex() + 1 + i,  obj);
+            writeColumnData(sheet, cursor.nextRowStartIndex(), cursor.nextCol(),  obj);
+            cursor.increaseColIndex();
         }
         LOG.info("Section={} from sheet={} completed with {} rows", getName(), sheet.getSheetName(), objectToBuild.size());
-        return startRowIndex + context.getMap().size();
+        cursor.increaseRowIndex(sectionDescriptor.getMap().size());
     }
+
     //TODO-0 Test that multiple sections in the same row work for read
     private void writeColumnNames(Sheet sheet, int rowStartIndex) {
-        int cellIndex = context.getColumnStartIndex();
-        for(FieldDescriptor fieldDescriptor: context.getMap().values()) {
+        int cellIndex = sectionDescriptor.getColumnStartIndex();
+        for(FieldDescriptor fieldDescriptor: sectionDescriptor.getMap().values()) {
             Row row = sheet.createRow(rowStartIndex++);
             LOG.debug("Created row={} in sheet={}", rowStartIndex, sheet.getSheetName());
             Cell cell = row.createCell(cellIndex);
@@ -107,8 +109,8 @@ public class PivotSectionParser<T> extends SectionParser<T> {
 
     private void writeColumnData(Sheet sheet, int rowStartIndex, int columnStartIndex,T obj) {
         LOG.debug("Writing in sheet={}, starting at row=[{}:{}], with column={}",
-                sheet.getSheetName(), rowStartIndex, rowStartIndex + context.getMap().size(), columnStartIndex);
-        for (FieldDescriptor fieldDescriptor: context.getMap().values()) {
+                sheet.getSheetName(), rowStartIndex, rowStartIndex + sectionDescriptor.getMap().size(), columnStartIndex);
+        for (FieldDescriptor fieldDescriptor: sectionDescriptor.getMap().values()) {
             Row row = sheet.getRow(rowStartIndex++);
             Cell cell = row.createCell(columnStartIndex);
             PoiUtil.fillCell(cell, fieldDescriptor, obj);

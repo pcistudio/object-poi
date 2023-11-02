@@ -37,11 +37,11 @@ public class TableSectionParser<ROW_MODEL> extends SectionParser<ROW_MODEL> {
         int columnIndex = 0;
         ROW_MODEL modelObject = newInstance();
         //TODO Remove this if
-        if (row.getCell(context.getColumnStartIndex()) == null) {
+        if (row.getCell(sectionDescriptor.getColumnStartIndex()) == null) {
             return;
         }
         int sectionLastIndex = getSectionLastCellIndex(row);
-        for (int i = context.getColumnStartIndex(); i < sectionLastIndex; i++) {
+        for (int i = sectionDescriptor.getColumnStartIndex(); i < sectionLastIndex; i++) {
             final Cell cell = row.getCell(i);
             if (columns[columnIndex] != null) {
                 populateRowObject(modelObject, columnIndex, cell);
@@ -71,30 +71,32 @@ public class TableSectionParser<ROW_MODEL> extends SectionParser<ROW_MODEL> {
     }
 
     @Override
-    public int write(Sheet sheet, int nextIndex) {
-        if (isStartIndexSet() && willOverrideData(nextIndex)) {
+    public void write(Sheet sheet, SheetCursor cursor) {
+        cursor.setSectionDescriptor(sectionDescriptor);
+        if (cursor.willOverrideData()) {
             throw new IllegalStateException(String.format("About to override row %s with sheet %s. " +
                     "Check that previous section is not bigger than expected. " +
-                    "For dynamic size better use startName property", context.getRowStartIndex(), sheet.getSheetName()));
+                    "For dynamic size better use startName property", sectionDescriptor.getRowStartIndex(), sheet.getSheetName()));
         }
         //TODO: in this line "nextIndex + 1" the 1 could be a configuration with the space between sections
         // in this example there is no space (nextIndex + spaceBetweenSection)
         // Create a context class to manage this numbers(SheetCursor) and the actual context should name a sectionDescriptor
         // Same for Pivot
-        int startRowIndex = isStartIndexNotSet() ? nextIndex : context.getRowStartIndex();
+        int startRowIndex = cursor.nextRowStartIndex();
 
         writeColumns(sheet, startRowIndex);
+        cursor.increaseRowIndex();
         for (int i = 0; i < objectToBuild.size(); i++) {
             ROW_MODEL obj = objectToBuild.get(i);
-            writeRow(sheet, startRowIndex + 1 + i,  obj);
+            writeRow(sheet, cursor.nextRow(),  obj);
+            cursor.increaseRowIndex();
         }
-        return startRowIndex + 1 + objectToBuild.size();
     }
 
     private void writeColumns(Sheet sheet, int rowStartIndex) {
         Row row = sheet.createRow(rowStartIndex);
-        int cellIndex = context.getColumnStartIndex();
-        for(FieldDescriptor fieldDescriptor: context.getMap().values()) {
+        int cellIndex = sectionDescriptor.getColumnStartIndex();
+        for(FieldDescriptor fieldDescriptor: sectionDescriptor.getMap().values()) {
             Cell cell = row.createCell(cellIndex++);
             cell.setCellValue(fieldDescriptor.getName());
         }
@@ -102,8 +104,8 @@ public class TableSectionParser<ROW_MODEL> extends SectionParser<ROW_MODEL> {
 
     private void writeRow(Sheet sheet, int rowStartIndex, ROW_MODEL obj) {
         Row row = sheet.createRow(rowStartIndex);
-        int cellIndex = context.getColumnStartIndex();
-        for (FieldDescriptor fieldDescriptor: context.getMap().values()) {
+        int cellIndex = sectionDescriptor.getColumnStartIndex();
+        for (FieldDescriptor fieldDescriptor: sectionDescriptor.getMap().values()) {
             Cell cell = row.createCell(cellIndex++);
             PoiUtil.fillCell(cell, fieldDescriptor, obj);
         }

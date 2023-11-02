@@ -1,5 +1,7 @@
 package com.pcistudio.poi.parser;
 
+import org.apache.poi.util.StringUtil;
+
 import java.util.Collections;
 import java.util.Map;
 
@@ -40,6 +42,26 @@ public class SectionDescriptor<T> {
     public int getColumnStartIndex() {
         return columnStartIndex;
     }
+
+
+
+
+    public boolean isStartIndexNotSet() {
+        return getRowStartIndex() < 0;
+    }
+
+    public boolean isStartValueNotSet() {
+        return StringUtil.isBlank(getStartValue());
+    }
+
+    public boolean isStartIndexSet() {
+        return !isStartIndexNotSet();
+    }
+
+    public boolean isStartValueSet() {
+        return !isStartValueNotSet();
+    }
+
 
     public static class Builder<T> {
         private final SectionDescriptor<T> context = new SectionDescriptor<>();

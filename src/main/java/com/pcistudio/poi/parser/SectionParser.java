@@ -17,7 +17,7 @@ import java.util.*;
 public abstract class SectionParser<T> {
     private static final Logger LOG = LoggerFactory.getLogger(SectionParser.class);
 
-    protected final SectionDescriptor<T> context;
+    protected final SectionDescriptor<T> sectionDescriptor;
 
     protected final List<T> objectToBuild;
 
@@ -26,12 +26,12 @@ public abstract class SectionParser<T> {
 
     private final String name;
 
-    public SectionParser(String name, List<T> objectToBuild, SectionDescriptor<T> context) {
+    public SectionParser(String name, List<T> objectToBuild, SectionDescriptor<T> sectionDescriptor) {
         this.name = name;
-        this.context = context;
+        this.sectionDescriptor = sectionDescriptor;
         this.objectToBuild = objectToBuild;
 //
-        Preconditions.allOrNothing("objectToBuild, recordClass must to be set together. Please check builder", objectToBuild, context.getRecordClass());
+        Preconditions.allOrNothing("objectToBuild, recordClass must to be set together. Please check builder", objectToBuild, sectionDescriptor.getRecordClass());
 //        TODO data will be ignored. Probably remove
         if (this.objectToBuild == null) {
             LOG.warn("Data will be ignored for section={}", name);
@@ -54,39 +54,39 @@ public abstract class SectionParser<T> {
     }
 
     protected boolean isStartIndexNotSet() {
-        return context.getRowStartIndex() < 0;
+        return sectionDescriptor.isStartIndexNotSet();
     }
 
     private boolean isStartValueNotSet() {
-        return StringUtil.isBlank(context.getStartValue());
+        return sectionDescriptor.isStartValueNotSet();
     }
 
     protected boolean isStartIndexSet() {
-        return !isStartIndexNotSet();
+        return sectionDescriptor.isStartIndexSet();
     }
 
     private boolean isStartValueSet() {
-        return !isStartValueNotSet();
+        return sectionDescriptor.isStartValueSet();
     }
 
     public boolean sectionStartedByIndex(int rowIndex) {
-        return rowIndex >= context.getRowStartIndex();
+        return rowIndex >= sectionDescriptor.getRowStartIndex();
     }
 
     public boolean willOverrideData(int nextIndex) {
-        return nextIndex > context.getRowStartIndex();
+        return nextIndex > sectionDescriptor.getRowStartIndex();
     }
 
 
     public boolean sectionStartedByName(String cellValue) {
-        return context.getStartValue().equals(cellValue);
+        return sectionDescriptor.getStartValue().equals(cellValue);
     }
 
     public boolean isActive(Row row, int rowIndex) {
         if (started) {
             return true;
         }
-        started = isActive(row.getCell(context.getColumnStartIndex()), rowIndex);
+        started = isActive(row.getCell(sectionDescriptor.getColumnStartIndex()), rowIndex);
         if (started) {
             LOG.debug("Selected sectionParser='{}' in row={}", getName(), rowIndex);
         }
@@ -136,7 +136,7 @@ public abstract class SectionParser<T> {
     protected abstract void doAccept(Row row);
 
     protected T newInstance() {
-        return PoiUtil.create(context.getRecordClass());
+        return PoiUtil.create(sectionDescriptor.getRecordClass());
     }
 
     @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
@@ -144,7 +144,7 @@ public abstract class SectionParser<T> {
         if (StringUtil.isBlank(columnName)) {
            throw new IllegalArgumentException("columnName cannot be null");
         }
-        FieldDescriptor fieldDescriptor = context.getMap().get(columnName);
+        FieldDescriptor fieldDescriptor = sectionDescriptor.getMap().get(columnName);
         if (fieldDescriptor == null) {
             return;
         }
@@ -164,8 +164,8 @@ public abstract class SectionParser<T> {
     }
 
     protected int getSectionLastCellIndex(Row row) {
-        return context.getColumnCount() != null
-                ? context.getColumnStartIndex() + context.getColumnCount()
+        return sectionDescriptor.getColumnCount() != null
+                ? sectionDescriptor.getColumnStartIndex() + sectionDescriptor.getColumnCount()
                 : row.getLastCellNum();
 
     }
@@ -186,7 +186,7 @@ public abstract class SectionParser<T> {
      * @return count of records written
      */
     //TODO check if nextIndex can come from the sheet
-    public abstract int write(Sheet sheet, int nextIndex);
+    public abstract void write(Sheet sheet, SheetCursor cursor);
 
     @Override
     public String toString() {

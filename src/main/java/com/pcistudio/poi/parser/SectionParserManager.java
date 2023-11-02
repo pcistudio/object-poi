@@ -65,12 +65,16 @@ public class SectionParserManager implements AutoCloseable {
     // You can determine columnCount by the number of fields in table
     public void write(Sheet sheet) {
         //TODO complete this method
-        int nextIndex = 0;
+        SheetCursor cursor = new SheetCursor();
         for (SectionParser<?> sectionParser : list) {
-            LOG.debug("Writing in sheet={}, section={}, nextIndex={}", sheet.getSheetName(), sectionParser, nextIndex);
-            nextIndex = sectionParser.write(sheet, nextIndex);
-            LOG.debug("Finish writing in sheet='{}', section='{}', nextIndex={}", sheet.getSheetName(), sectionParser, nextIndex);
+            LOG.debug("Writing in sheet={}, section={}, nextIndex={}", sheet.getSheetName(), sectionParser, cursor.nextRow());
+            sectionParser.write(sheet, cursor);
+            LOG.debug("Finish writing in sheet='{}', section='{}', nextIndex={}", sheet.getSheetName(), sectionParser, cursor.nextRow());
         }
         LOG.info("Write in {} Completed", sheet.getSheetName());
+    }
+
+    private SheetCursor createCursor() {
+        return new SheetCursor();
     }
 }
