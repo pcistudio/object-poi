@@ -75,11 +75,7 @@ public class PivotSectionParser<T> extends SectionParser<T> {
     // in the builder we will need sameRow() or nextRow() functions
     // and in the SectionParser we will need a some properties that tell the writer to write in the next row or in the same row.
     public void write(Sheet sheet, SheetCursor cursor) {
-        if (cursor.willOverrideData()) {
-            throw new IllegalStateException(String.format("About to override row %s with sheet %s. " +
-                    "Check that previous section is not bigger than expected. " +
-                    "For dynamic size better use startName property", sectionDescriptor.getRowStartIndex(), sheet.getSheetName()));
-        }
+
         if (objectToBuild == null) {
             LOG.warn("Ignoring section={} in sheet={}", getName(), sheet.getSheetName());
             return;

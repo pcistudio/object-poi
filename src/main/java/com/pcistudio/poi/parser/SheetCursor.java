@@ -44,11 +44,19 @@ public class SheetCursor {
 
     public void beginSection(SectionDescriptor<?> sectionDescriptor) {
         this.sectionDescriptor = sectionDescriptor;
+        if (willOverrideData()) {
+            throw new IllegalStateException(String.format("About to override row %s with sheet %s. " +
+                    "Check that previous section is not bigger than expected. " +
+                    "For dynamic size better use startName property", sectionDescriptor.getRowStartIndex()
+                    , "sheet.getSheetName()"));
+//                    , sheet.getSheetName()));
+        }
         if (sectionDescriptor.isDisplayNextRow()) {
-            nextCol = 0;
+            nextCol = sectionDescriptor.getColumnStartIndex();
+            nextRow = sectionDescriptor.isStartIndexNotSet() ? nextRow : sectionDescriptor.getRowStartIndex();
             sectionStartRow = nextRow;
-
         } else {
+
             nextRow = sectionStartRow;
         }
     }

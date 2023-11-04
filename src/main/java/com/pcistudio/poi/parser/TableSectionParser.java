@@ -72,11 +72,7 @@ public class TableSectionParser<ROW_MODEL> extends SectionParser<ROW_MODEL> {
 
     @Override
     public void write(Sheet sheet, SheetCursor cursor) {
-        if (cursor.willOverrideData()) {
-            throw new IllegalStateException(String.format("About to override row %s with sheet %s. " +
-                    "Check that previous section is not bigger than expected. " +
-                    "For dynamic size better use startName property", sectionDescriptor.getRowStartIndex(), sheet.getSheetName()));
-        }
+
         //TODO: in this line "nextIndex + 1" the 1 could be a configuration with the space between sections
         // in this example there is no space (nextIndex + spaceBetweenSection)
         // Create a context class to manage this numbers(SheetCursor) and the actual context should name a sectionDescriptor
