@@ -2,16 +2,12 @@ package com.pcistudio.poi.parser;
 
 public class SheetCursor {
     private SectionDescriptor<?> sectionDescriptor;
-
+    private int sectionStartRow = 0;
+//    private int sectionStartCol = 0;
     private int nextRow = 0;
-
     private int nextCol = 0;
 
     public SheetCursor() {
-    }
-
-    public void setSectionDescriptor(SectionDescriptor<?> sectionDescriptor) {
-        this.sectionDescriptor = sectionDescriptor;
     }
 
     public int nextRow() {
@@ -44,5 +40,16 @@ public class SheetCursor {
 
     public void increaseColIndex(int count) {
         nextCol += count;
+    }
+
+    public void beginSection(SectionDescriptor<?> sectionDescriptor) {
+        this.sectionDescriptor = sectionDescriptor;
+        if (sectionDescriptor.isDisplayNextRow()) {
+            nextCol = 0;
+            sectionStartRow = nextRow;
+
+        } else {
+            nextRow = sectionStartRow;
+        }
     }
 }

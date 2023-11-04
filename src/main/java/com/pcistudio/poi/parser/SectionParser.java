@@ -49,6 +49,10 @@ public abstract class SectionParser<T> {
         return rowCount;
     }
 
+    public SectionDescriptor<T> getSectionDescriptor() {
+        return sectionDescriptor;
+    }
+
     protected boolean isStarted() {
         return started;
     }
@@ -86,11 +90,7 @@ public abstract class SectionParser<T> {
         if (started) {
             return true;
         }
-        started = isActive(row.getCell(sectionDescriptor.getColumnStartIndex()), rowIndex);
-        if (started) {
-            LOG.debug("Selected sectionParser='{}' in row={}", getName(), rowIndex);
-        }
-        return started;
+        return started = isActive(row.getCell(sectionDescriptor.getColumnStartIndex()), rowIndex);
     }
 
     private boolean isActive(Cell cell, int rowIndex) {
@@ -159,8 +159,8 @@ public abstract class SectionParser<T> {
     }
 
     public void notifyCompletion() {
-        LOG.debug("Section '{}' completed", getName());
         printResume();
+        LOG.debug("Section '{}' completed", getName());
     }
 
     protected int getSectionLastCellIndex(Row row) {
@@ -190,7 +190,7 @@ public abstract class SectionParser<T> {
 
     @Override
     public String toString() {
-        return String.format("%s[%s]", getClass().getName(), getName());
+        return String.format("%s[%s]", getClass().getSimpleName(), getName());
     }
 
 }

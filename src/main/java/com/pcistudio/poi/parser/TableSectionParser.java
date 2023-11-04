@@ -72,7 +72,6 @@ public class TableSectionParser<ROW_MODEL> extends SectionParser<ROW_MODEL> {
 
     @Override
     public void write(Sheet sheet, SheetCursor cursor) {
-        cursor.setSectionDescriptor(sectionDescriptor);
         if (cursor.willOverrideData()) {
             throw new IllegalStateException(String.format("About to override row %s with sheet %s. " +
                     "Check that previous section is not bigger than expected. " +
@@ -91,6 +90,7 @@ public class TableSectionParser<ROW_MODEL> extends SectionParser<ROW_MODEL> {
             writeRow(sheet, cursor.nextRow(),  obj);
             cursor.increaseRowIndex();
         }
+        cursor.increaseColIndex(sectionDescriptor.getMap().size());
     }
 
     private void writeColumns(Sheet sheet, int rowStartIndex) {

@@ -15,6 +15,8 @@ public class SectionDescriptor<T> {
 
     private Short columnCount;
 
+    private boolean displayNextRow = true;
+
     public int getRowStartIndex() {
         return rowStartIndex;
     }
@@ -43,8 +45,9 @@ public class SectionDescriptor<T> {
         return columnStartIndex;
     }
 
-
-
+    public boolean isDisplayNextRow() {
+        return displayNextRow;
+    }
 
     public boolean isStartIndexNotSet() {
         return getRowStartIndex() < 0;
@@ -63,8 +66,10 @@ public class SectionDescriptor<T> {
     }
 
 
+
+
     public static class Builder<T> {
-        private final SectionDescriptor<T> context = new SectionDescriptor<>();
+        private final SectionDescriptor<T> descriptor = new SectionDescriptor<>();
 
         /**
          * descriptorMap allow null when only want to parse the section but don't want to keep the data
@@ -76,7 +81,7 @@ public class SectionDescriptor<T> {
          */
         public Builder<T> descriptorMap(Map<String, FieldDescriptor> descriptorMap) {
 
-            context.map = Collections.unmodifiableMap(descriptorMap);
+            descriptor.map = Collections.unmodifiableMap(descriptorMap);
             return this;
         }
 
@@ -89,7 +94,7 @@ public class SectionDescriptor<T> {
          * @return
          */
         public Builder<T> recordClass(Class<T> objectClass) {
-            context.recordClass = objectClass;
+            descriptor.recordClass = objectClass;
             return this;
         }
 
@@ -97,27 +102,32 @@ public class SectionDescriptor<T> {
             if (columnStartIndex < 0) {
                 throw new IllegalArgumentException("columnStartIndex can not be less that zero");
             }
-            context.columnStartIndex = columnStartIndex;
+            descriptor.columnStartIndex = columnStartIndex;
+            return this;
+        }
+
+        public Builder<T> displayNextRow(boolean displayNextRow) {
+            descriptor.displayNextRow = displayNextRow;
             return this;
         }
 
         public Builder<T> columnCount(Short columnCount) {
-            context.columnCount = columnCount;
+            descriptor.columnCount = columnCount;
             return this;
         }
 
         public Builder<T> rowStartIndex(int rowStartIndex) {
-            context.rowStartIndex = rowStartIndex;
+            descriptor.rowStartIndex = rowStartIndex;
             return this;
         }
 
         public Builder<T> startValue(String startValue) {
-            context.startValue = startValue;
+            descriptor.startValue = startValue;
             return this;
         }
 
         public SectionDescriptor<T> build() {
-            return context;
+            return descriptor;
         }
     }
 }

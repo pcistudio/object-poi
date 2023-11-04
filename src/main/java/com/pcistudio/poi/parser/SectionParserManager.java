@@ -32,17 +32,21 @@ public class SectionParserManager implements AutoCloseable {
         for (int i = list.size() - 1; i >= 0; i--) {
             SectionParser<?> sectionParser = list.get(i);
             if (sectionParser.isActive(row, rowIndex)) {
-                notifyCompletion(sectionParser);
-                return currentSectionParser = sectionParser;
+                setCurrentParser(sectionParser, rowIndex);
+                return currentSectionParser;
             }
         }
         throw new IllegalStateException("SectionParser not found");
     }
 
 
-    private void notifyCompletion(SectionParser<?> sectionParser) {
-        if (currentSectionParser != null && !currentSectionParser.equals(sectionParser)) {
-            currentSectionParser.notifyCompletion();
+    private void setCurrentParser(SectionParser<?> sectionParser, int rowIndex) {
+        if (!sectionParser.equals(currentSectionParser)) {
+            if (currentSectionParser != null) {
+                currentSectionParser.notifyCompletion();
+            }
+            currentSectionParser = sectionParser;
+            LOG.debug("Selected sectionParser='{}' in row={}", sectionParser.getName(), rowIndex);
         }
     }
 
@@ -67,9 +71,10 @@ public class SectionParserManager implements AutoCloseable {
         //TODO complete this method
         SheetCursor cursor = new SheetCursor();
         for (SectionParser<?> sectionParser : list) {
-            LOG.debug("Writing in sheet={}, section={}, nextIndex={}", sheet.getSheetName(), sectionParser, cursor.nextRow());
+            cursor.beginSection(sectionParser.getSectionDescriptor());
+            LOG.debug("Writing in sheet={}, section={}, nextRow={}, nextCol={}", sheet.getSheetName(), sectionParser, cursor.nextRow(), cursor.nextCol());
             sectionParser.write(sheet, cursor);
-            LOG.debug("Finish writing in sheet='{}', section='{}', nextIndex={}", sheet.getSheetName(), sectionParser, cursor.nextRow());
+            LOG.debug("Finish writing in sheet='{}', section='{}', nextRow={}, nextCol={}", sheet.getSheetName(), sectionParser, cursor.nextRow(), cursor.nextCol());
         }
         LOG.info("Write in {} Completed", sheet.getSheetName());
     }
