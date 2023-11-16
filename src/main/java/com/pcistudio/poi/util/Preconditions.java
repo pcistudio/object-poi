@@ -1,5 +1,7 @@
 package com.pcistudio.poi.util;
 
+import java.util.List;
+
 public class Preconditions {
 
     @SuppressWarnings("PMD")
@@ -21,6 +23,12 @@ public class Preconditions {
 
     public static void notEmpty(Object[] objects, String message) {
         if (objects == null || objects.length == 0) {
+            throw new IllegalArgumentException(message);
+        }
+    }
+
+    public static void notEmpty(List<?> objects, String message) {
+        if (objects == null || objects.isEmpty()) {
             throw new IllegalArgumentException(message);
         }
     }

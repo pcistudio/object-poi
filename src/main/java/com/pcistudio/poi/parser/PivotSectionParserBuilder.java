@@ -18,6 +18,8 @@ public class PivotSectionParserBuilder<T> {
 
     private Class<T> recordClass;
 
+    private boolean displayNextRow = true;
+
     public PivotSectionParserBuilder<T> withName(String name) {
         this.name = name;
         return this;
@@ -30,6 +32,11 @@ public class PivotSectionParserBuilder<T> {
 
     public PivotSectionParserBuilder<T> withStartValue(String startValue) {
         this.startValue = startValue;
+        return this;
+    }
+
+    public PivotSectionParserBuilder<T> displayInCurrentRow() {
+        this.displayNextRow = false;
         return this;
     }
 
@@ -70,6 +77,7 @@ public class PivotSectionParserBuilder<T> {
                         .columnStartIndex(columnStartIndex)
                         .columnCount(columnCount)
                         .recordClass(recordClass)
+                        .displayNextRow(displayNextRow)
                         .descriptorMap(FieldDescriptor.loadFrom(recordClass))
                         .build()
         );

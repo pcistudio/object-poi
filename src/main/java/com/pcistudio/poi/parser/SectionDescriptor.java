@@ -1,19 +1,25 @@
 package com.pcistudio.poi.parser;
 
+
 import org.apache.poi.util.StringUtil;
 
 import java.util.Collections;
 import java.util.Map;
 
-public class SectionDescriptor<T> {
+public class SectionDescriptor<T> implements SectionLocation {
     private int rowStartIndex = -1;
     private String startValue;
 
-    private Map<String, FieldDescriptor> map;
+    private transient Map<String, FieldDescriptor> descriptorMap;
+
+    private int descriptorMapSize;
+
     private Class<T> recordClass;
     private int columnStartIndex = 0;
 
     private Short columnCount;
+
+    private Short rowCount;
 
     private boolean displayNextRow = true;
 
@@ -25,8 +31,12 @@ public class SectionDescriptor<T> {
         return startValue;
     }
 
-    public Map<String, FieldDescriptor> getMap() {
-        return map;
+    public Map<String, FieldDescriptor> getDescriptorMap() {
+        return descriptorMap;
+    }
+
+    public int getDescriptorMapSize() {
+        return descriptorMapSize;
     }
 
     public Class<T> getRecordClass() {
@@ -49,24 +59,13 @@ public class SectionDescriptor<T> {
         return displayNextRow;
     }
 
-    public boolean isStartIndexNotSet() {
-        return getRowStartIndex() < 0;
-    }
-
     public boolean isStartValueNotSet() {
         return StringUtil.isBlank(getStartValue());
-    }
-
-    public boolean isStartIndexSet() {
-        return !isStartIndexNotSet();
     }
 
     public boolean isStartValueSet() {
         return !isStartValueNotSet();
     }
-
-
-
 
     public static class Builder<T> {
         private final SectionDescriptor<T> descriptor = new SectionDescriptor<>();
@@ -81,7 +80,8 @@ public class SectionDescriptor<T> {
          */
         public Builder<T> descriptorMap(Map<String, FieldDescriptor> descriptorMap) {
 
-            descriptor.map = Collections.unmodifiableMap(descriptorMap);
+            descriptor.descriptorMap = Collections.unmodifiableMap(descriptorMap);
+            descriptor.descriptorMapSize = descriptor.descriptorMap.size();
             return this;
         }
 
@@ -113,6 +113,11 @@ public class SectionDescriptor<T> {
 
         public Builder<T> columnCount(Short columnCount) {
             descriptor.columnCount = columnCount;
+            return this;
+        }
+
+        public Builder<T> rowCount(Short rowCount) {
+            descriptor.rowCount = rowCount;
             return this;
         }
 

@@ -35,7 +35,9 @@ public abstract class ColumnSheetParser<T> implements SheetParser<T> {
             for (int index = 0; index <= sheet.getLastRowNum(); index++) {
                 Row row = sheet.getRow(index);
                 if (row != null) {
-                    SectionParser<?> sectionParser = sectionParserManager.get(row, index);
+                    // compose SectionParser to be able to send the same row to both
+                    // to put them together i have to relay in a property set in the builder
+                    ReadSectionParser sectionParser = sectionParserManager.get(row, index);
                     sectionParser.accept(row);
                 } else {
                     LOG.trace("Empty row {}", index);

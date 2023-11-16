@@ -1,6 +1,5 @@
 package com.pcistudio.poi.parser;
 
-import com.google.gson.Gson;
 import com.pcistudio.poi.util.PoiUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -11,7 +10,9 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
-public class TableSectionParser<ROW_MODEL> extends SectionParser<ROW_MODEL> {
+import static com.pcistudio.poi.util.GsonUtil.toJson;
+
+public class TableSectionParser<ROW_MODEL> extends SimpleSectionParser<ROW_MODEL> {
     private static final Logger LOG = LoggerFactory.getLogger(TableSectionParser.class);
     private String[] columns;
 
@@ -22,7 +23,7 @@ public class TableSectionParser<ROW_MODEL> extends SectionParser<ROW_MODEL> {
     @Override
     public void doFirstRow(Row row) {
         columns = loadColumnsName(row);
-        LOG.info("Found {} columns={}", columns.length, new Gson().toJson(columns));
+        LOG.info("Found {} columns={}", columns.length, toJson(columns));
     }
 
     private String[] loadColumnsName(Row row) {
@@ -67,7 +68,7 @@ public class TableSectionParser<ROW_MODEL> extends SectionParser<ROW_MODEL> {
     protected void printResume() {
         LOG.info("sectionParser='{}' found {} columns, {} rows", getName(), columns.length, get().size());
         get().stream().limit(10)
-                .forEach(rowModel -> LOG.debug("{}", new Gson().toJson(rowModel)));
+                .forEach(rowModel -> LOG.debug("{}", toJson(rowModel)));
     }
 
     @Override
@@ -77,33 +78,35 @@ public class TableSectionParser<ROW_MODEL> extends SectionParser<ROW_MODEL> {
         // in this example there is no space (nextIndex + spaceBetweenSection)
         // Create a context class to manage this numbers(SheetCursor) and the actual context should name a sectionDescriptor
         // Same for Pivot
-        int startRowIndex = cursor.nextRowStartIndex();
 
-        writeColumns(sheet, startRowIndex);
-        cursor.increaseRowIndex();
+        writeColumns(sheet, cursor);
         for (int i = 0; i < objectToBuild.size(); i++) {
             ROW_MODEL obj = objectToBuild.get(i);
-            writeRow(sheet, cursor.nextRow(),  obj);
-            cursor.increaseRowIndex();
+            writeRow(sheet, cursor,  obj);
         }
-        cursor.increaseColIndex(sectionDescriptor.getMap().size());
+        cursor.increaseColIndex(sectionDescriptor.getDescriptorMap().size());
     }
 
-    private void writeColumns(Sheet sheet, int rowStartIndex) {
-        Row row = sheet.createRow(rowStartIndex);
-        int cellIndex = sectionDescriptor.getColumnStartIndex();
-        for(FieldDescriptor fieldDescriptor: sectionDescriptor.getMap().values()) {
-            Cell cell = row.createCell(cellIndex++);
+    private void writeColumns(Sheet sheet, SheetCursor cursor) {
+        Row row = getOrCreateRow(sheet, cursor);
+        for(FieldDescriptor fieldDescriptor: sectionDescriptor.getDescriptorMap().values()) {
+
+            Cell cell = row.createCell(cursor.nextCol());
             cell.setCellValue(fieldDescriptor.getName());
+            logColumnName(LOG, sheet, cursor, fieldDescriptor);
+            cursor.increaseColIndex();
         }
+        cursor.endRow();
     }
 
-    private void writeRow(Sheet sheet, int rowStartIndex, ROW_MODEL obj) {
-        Row row = sheet.createRow(rowStartIndex);
-        int cellIndex = sectionDescriptor.getColumnStartIndex();
-        for (FieldDescriptor fieldDescriptor: sectionDescriptor.getMap().values()) {
-            Cell cell = row.createCell(cellIndex++);
+    private void writeRow(Sheet sheet, SheetCursor cursor, ROW_MODEL obj) {
+        Row row = getOrCreateRow(sheet, cursor);
+        for (FieldDescriptor fieldDescriptor: sectionDescriptor.getDescriptorMap().values()) {
+            Cell cell = row.createCell(cursor.nextCol());
             PoiUtil.fillCell(cell, fieldDescriptor, obj);
+            logCellValue(LOG, sheet, cursor, fieldDescriptor, obj);
+            cursor.increaseColIndex();
         }
+        cursor.endRow();
     }
 }

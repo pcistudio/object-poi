@@ -25,7 +25,7 @@
         <Bug code="EI2"/>
     </Match>
     <Match>
-        <Class name="com.pcistudio.poi.parser.SectionParser"/>
+        <Class name="com.pcistudio.poi.parser.SimpleSectionParser"/>
         <Bug code="EI2"/>
     </Match>
     <Match>

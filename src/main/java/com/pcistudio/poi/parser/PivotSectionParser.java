@@ -1,6 +1,5 @@
 package com.pcistudio.poi.parser;
 
-import com.google.gson.Gson;
 import com.pcistudio.poi.util.PoiUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -10,11 +9,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Optional;
+
+import static com.pcistudio.poi.util.GsonUtil.toJson;
+import static com.pcistudio.poi.util.PoiUtil.retrieveFieldValue;
 
 //TODO add pluggins for checkstyle
 //TODO create the gitactions build
 // Deploy the artifact in maven central
-public class PivotSectionParser<T> extends SectionParser<T> {
+public class PivotSectionParser<T> extends SimpleSectionParser<T> {
     private static final Logger LOG = LoggerFactory.getLogger(PivotSectionParser.class);
 
     protected PivotSectionParser(String name, List<T> objectToBuild, SectionDescriptor<T> context) {
@@ -45,7 +48,7 @@ public class PivotSectionParser<T> extends SectionParser<T> {
             }
         } catch (Exception exception) {
             LOG.error("Error populating object for row {}", getRowCount(), exception);
-            LOG.debug(new Gson().toJson(objectToBuild));
+            LOG.debug(toJson(objectToBuild));
         }
     }
 
@@ -62,10 +65,10 @@ public class PivotSectionParser<T> extends SectionParser<T> {
     protected void printResume() {
         LOG.info("sectionParser='{}' found {} records", getName(), get().size());
         if (sectionDescriptor.isKeyValue()) {
-            LOG.debug("sectionParser='{}' result={}", getName(), new Gson().toJson(get()));
+            LOG.debug("sectionParser='{}' result={}", getName(), toJson(get()));
         } else {
             get().stream().limit(10)
-                    .forEach(row -> LOG.debug("{}", new Gson().toJson(row)));
+                    .forEach(row -> LOG.debug("{}", toJson(row)));
         }
     }
 
@@ -81,36 +84,39 @@ public class PivotSectionParser<T> extends SectionParser<T> {
             return;
         }
 
-        writeColumnNames(sheet, cursor.nextRowStartIndex());
-        cursor.increaseColIndex();
+        writeColumnNames(sheet, cursor);
         for (int i = 0; i < objectToBuild.size(); i++) {
             T obj = objectToBuild.get(i);
-            writeColumnData(sheet, cursor.nextRowStartIndex(), cursor.nextCol(),  obj);
-            cursor.increaseColIndex();
+            writeColumnData(sheet, cursor,  obj);
         }
         LOG.info("Section={} from sheet={} completed with {} columns", this, sheet.getSheetName(), objectToBuild.size());
-        cursor.increaseRowIndex(sectionDescriptor.getMap().size());
+//        cursor.increaseRowIndex(sectionDescriptor.getMap().size());
     }
 
     //TODO-0 Test that multiple sections in the same row work for read
-    private void writeColumnNames(Sheet sheet, int rowStartIndex) {
-        int cellIndex = sectionDescriptor.getColumnStartIndex();
-        for(FieldDescriptor fieldDescriptor: sectionDescriptor.getMap().values()) {
-            Row row = sheet.createRow(rowStartIndex++);
-            LOG.debug("Created row={} in sheet={}", rowStartIndex, sheet.getSheetName());
-            Cell cell = row.createCell(cellIndex);
+    private void writeColumnNames(Sheet sheet, SheetCursor cursor) {
+        for(FieldDescriptor fieldDescriptor: sectionDescriptor.getDescriptorMap().values()) {
+            Row row = getOrCreateRow(sheet, cursor);
+            Cell cell = row.createCell(cursor.nextCol());
             cell.setCellValue(fieldDescriptor.getName());
+            logColumnName(LOG, sheet, cursor, fieldDescriptor);
+            cursor.increaseRowIndex();
         }
+        cursor.endColumn();
     }
 
-    private void writeColumnData(Sheet sheet, int rowStartIndex, int columnStartIndex,T obj) {
-        LOG.debug("Writing in sheet={}, starting at row=[{}:{}], with column={}",
-                sheet.getSheetName(), rowStartIndex, rowStartIndex + sectionDescriptor.getMap().size(), columnStartIndex);
-        for (FieldDescriptor fieldDescriptor: sectionDescriptor.getMap().values()) {
-            Row row = sheet.getRow(rowStartIndex++);
-            Cell cell = row.createCell(columnStartIndex);
+
+    private void writeColumnData(Sheet sheet, SheetCursor cursor,T obj) {
+        LOG.debug("Writing in sheet={}, section={}, starting at row=[{}:{}], with column={}",
+                sheet.getSheetName(), getName(), cursor.nextRow(), cursor.maxRowByFieldCount(), cursor.nextCol());
+        for (FieldDescriptor fieldDescriptor: sectionDescriptor.getDescriptorMap().values()) {
+            Row row = sheet.getRow(cursor.nextRow());
+            Cell cell = row.createCell(cursor.nextCol());
             PoiUtil.fillCell(cell, fieldDescriptor, obj);
+            logCellValue(LOG, sheet, cursor, fieldDescriptor, obj);
+            cursor.increaseRowIndex();
         }
+        cursor.endColumn();
     }
 
 

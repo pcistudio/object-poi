@@ -8,29 +8,37 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+//TODO MAYBE Split this class in one for read and one for write with a base class
+// Because the composeSectionParser wont work with the write
 public class SectionParserManager implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(SectionParserManager.class);
-    private final List<SectionParser<?>> list = new ArrayList<>();
+    private final List<WriteSectionParser<?>> write = new ArrayList<>();
 
-    private SectionParser<?> currentSectionParser = null;
+    private final List<ReadSectionParser> read = new ArrayList<>();
+
+    private ReadSectionParser currentSectionParser = null;
 
     public SectionParserManager register(SectionParser<?> sectionParser) {
-        list.add(sectionParser);
+        write.add(sectionParser);
+        if (sectionParser.getSectionLocation().isDisplayNextRow()) {
+            read.add(sectionParser);
+        } else {
+            combineReadParser(sectionParser);
+        }
         return this;
     }
 
     public SectionParserManager register(List<SectionParser<?>> sectionParserList) {
-        list.addAll(sectionParserList);
+        sectionParserList.forEach(this::register);
         return this;
     }
 
-    public SectionParser<?> get(Row row, int rowIndex) {
-        if (list.isEmpty()) {
+    public ReadSectionParser get(Row row, int rowIndex) {
+        if (read.isEmpty()) {
             throw new IllegalStateException("There is none SectionParser register ");
         }
-
-        for (int i = list.size() - 1; i >= 0; i--) {
-            SectionParser<?> sectionParser = list.get(i);
+        for (int i = read.size() - 1; i >= 0; i--) {
+            ReadSectionParser sectionParser = read.get(i);
             if (sectionParser.isActive(row, rowIndex)) {
                 setCurrentParser(sectionParser, rowIndex);
                 return currentSectionParser;
@@ -39,8 +47,18 @@ public class SectionParserManager implements AutoCloseable {
         throw new IllegalStateException("SectionParser not found");
     }
 
+    private void combineReadParser(ReadSectionParser sectionParser) {
+        if (read.isEmpty()) {
+            LOG.warn("Nothing to compose sectionParser list is empty");
+        } else {
+            int last = read.size() - 1;
+            ReadSectionParser composeReadSectionParser = ReadSectionParser.compose(read.get(last), sectionParser);
+            LOG.trace("Created compose sectionParser={}", composeReadSectionParser);
+            read.set(last, composeReadSectionParser);
+        }
+    }
 
-    private void setCurrentParser(SectionParser<?> sectionParser, int rowIndex) {
+    private void setCurrentParser(ReadSectionParser sectionParser, int rowIndex) {
         if (!sectionParser.equals(currentSectionParser)) {
             if (currentSectionParser != null) {
                 currentSectionParser.notifyCompletion();
@@ -54,12 +72,12 @@ public class SectionParserManager implements AutoCloseable {
     public void close() {
         if (currentSectionParser != null) {
             currentSectionParser.notifyCompletion();
-            checkAllParserWereUsed();
+            checkAllReadParserWereUsed();
         }
     }
 
-    private void checkAllParserWereUsed() {
-        if (!list.get(list.size() - 1).equals(currentSectionParser)) {
+    private void checkAllReadParserWereUsed() {
+        if (!read.get(read.size() - 1).equals(currentSectionParser)) {
             LOG.warn("Not all parser were used. Last parser used {}", currentSectionParser);
         }
     }
@@ -70,16 +88,12 @@ public class SectionParserManager implements AutoCloseable {
     public void write(Sheet sheet) {
         //TODO complete this method
         SheetCursor cursor = new SheetCursor();
-        for (SectionParser<?> sectionParser : list) {
-            cursor.beginSection(sectionParser.getSectionDescriptor());
+        for (WriteSectionParser<?> sectionParser : write) {
+            cursor.beginSection(sectionParser.getName(), sectionParser.getSectionLocation(), sectionParser.objectToBuildSize());
             LOG.debug("Writing in sheet={}, section={}, nextRow={}, nextCol={}", sheet.getSheetName(), sectionParser, cursor.nextRow(), cursor.nextCol());
             sectionParser.write(sheet, cursor);
             LOG.debug("Finish writing in sheet='{}', section='{}', nextRow={}, nextCol={}", sheet.getSheetName(), sectionParser, cursor.nextRow(), cursor.nextCol());
         }
         LOG.info("Write in {} Completed", sheet.getSheetName());
-    }
-
-    private SheetCursor createCursor() {
-        return new SheetCursor();
     }
 }

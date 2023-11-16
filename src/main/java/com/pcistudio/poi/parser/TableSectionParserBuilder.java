@@ -18,6 +18,8 @@ public class TableSectionParserBuilder<T> {
     // in the pivot it makes sence
     private Short columnCount;
 
+    private boolean displayNextRow = true;
+
     public TableSectionParserBuilder<T> withName(String name) {
         this.name = name;
         return this;
@@ -27,6 +29,8 @@ public class TableSectionParserBuilder<T> {
         this.objectToBuild = objectToBuild;
         return this;
     }
+
+
 
     public TableSectionParserBuilder<T> withRowStartIndex(int rowStartIndex) {
         this.rowStartIndex = rowStartIndex;
@@ -40,6 +44,11 @@ public class TableSectionParserBuilder<T> {
 
     public TableSectionParserBuilder<T> withStartValue(String startValue) {
         this.startValue = startValue;
+        return this;
+    }
+
+    public TableSectionParserBuilder<T> displayInCurrentRow() {
+        this.displayNextRow = false;
         return this;
     }
 
@@ -66,6 +75,7 @@ public class TableSectionParserBuilder<T> {
                         .columnStartIndex(columnStartIndex)
                         .columnCount(columnCount)
                         .recordClass(recordClass)
+                        .displayNextRow(displayNextRow)
                         .descriptorMap(FieldDescriptor.loadFrom(recordClass))
                         .build()
         );

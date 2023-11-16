@@ -1,6 +1,5 @@
 package com.pcistudio.poi.util;
 
-import com.google.gson.internal.Primitives;
 import com.pcistudio.poi.parser.FieldDescriptor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -93,7 +92,8 @@ public class PoiUtil {
             return "";
         }
         StringBuilder sb = new StringBuilder();
-        for (Cell cell : row) {
+        for (int i = 0; i < row.getLastCellNum() ; i++) {
+            Cell cell = row.getCell(i);
             sb.append(cellSanitize(cell, "#.##"));
             sb.append("\t|\t");
         }
@@ -143,5 +143,9 @@ public class PoiUtil {
         } catch (IllegalAccessException e) {
             throw new RuntimeException(String.format("Error getting field=%s from class=%s", field.getName(), obj.getClass().getCanonicalName()), e);
         }
+    }
+
+    public static Object retrieveFieldValue(FieldDescriptor descriptor, Object obj) {
+        return retrieveFieldValue(descriptor.getField(), obj);
     }
 }
