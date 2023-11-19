@@ -42,7 +42,7 @@ bin/
 .DS_Store
 .idea/
 
-src/test/
+#src/test/
 
 test-*.xlsx
 ~$test-*.xlsx

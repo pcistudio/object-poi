@@ -9,7 +9,6 @@ public class SheetCursor {
     private static final Logger LOG = LoggerFactory.getLogger(SheetCursor.class);
     private String sectionName;
     private int sectionStartRow = 0;
-    private int sectionStartColumn = 0;
     private int nextRow = 0;
     private int nextCol = 0;
 
@@ -86,7 +85,7 @@ public class SheetCursor {
     public void endRow() {
         increaseRowIndex();
         if (nextRow <= maxRowsSectionGroup) {
-            nextCol = sectionStartColumn;
+            nextCol = sectionBox.getColumnStartIndex();
             trace(LOG, "End row");
         } else {
             trace(LOG, "End row when section finished");
@@ -103,12 +102,10 @@ public class SheetCursor {
             nextCol = sectionBox.getColumnStartIndex();
             nextRow = sectionBox.isStartIndexNotSet() ? maxRowsSectionGroup : sectionBox.getRowStartIndex();
             sectionStartRow = nextRow;
-            sectionStartColumn = nextCol;
             trace(LOG, "Begin section type=DisplayNextRow");
             setMaxRowsSectionGroup();
         } else {
             nextCol = sectionBox.getColumnStartIndex();
-            sectionStartColumn = nextCol;
             nextRow = sectionStartRow;
             updateMaxRowsSectionGroup();
         }
