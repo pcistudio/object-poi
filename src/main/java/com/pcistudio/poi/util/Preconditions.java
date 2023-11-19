@@ -38,4 +38,16 @@ public class Preconditions {
             throw new IllegalArgumentException(message);
         }
     }
+
+    public static void lessThan(int number, int maxValue, String message) {
+        if (number >= maxValue) {
+            throw new IllegalArgumentException(message);
+        }
+    }
+
+    public static void greaterThan(short number, int minValue, String message) {
+        if (number <= minValue) {
+            throw new IllegalArgumentException(message);
+        }
+    }
 }

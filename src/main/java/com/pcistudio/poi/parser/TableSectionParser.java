@@ -17,7 +17,7 @@ public class TableSectionParser<ROW_MODEL> extends SimpleSectionParser<ROW_MODEL
     private String[] columns;
 
     protected TableSectionParser(String name, List<ROW_MODEL> objectToBuild, SectionDescriptor<ROW_MODEL> context) {
-        super(name, objectToBuild, context);
+        super(name, objectToBuild, context, TableSectionBox::new);
     }
 
     @Override
@@ -73,6 +73,8 @@ public class TableSectionParser<ROW_MODEL> extends SimpleSectionParser<ROW_MODEL
 
     @Override
     public void write(Sheet sheet, SheetCursor cursor) {
+        cursor.beginSection(getName(), getSectionBox(), objectToBuildSize());
+        LOG.debug("Writing in sheet={}, section={}, nextRow={}, nextCol={}", sheet.getSheetName(), this, cursor.nextRow(), cursor.nextCol());
 
         //TODO: in this line "nextIndex + 1" the 1 could be a configuration with the space between sections
         // in this example there is no space (nextIndex + spaceBetweenSection)

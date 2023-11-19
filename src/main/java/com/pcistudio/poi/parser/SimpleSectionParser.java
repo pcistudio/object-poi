@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.function.BiFunction;
 
 import static com.pcistudio.poi.util.PoiUtil.retrieveFieldValue;
 import static com.pcistudio.poi.util.SecurityUtil.resume;
@@ -18,7 +19,7 @@ import static com.pcistudio.poi.util.SecurityUtil.sanitize;
  * This class needs to be new every time that you are trying to use it because it is stateful
  * @param <T>
  */
-public abstract class SimpleSectionParser<T> implements SectionParser<T> {
+public abstract class SimpleSectionParser<T> extends AbstractWriteSectionParser<T> implements SectionParser<T> {
     private static final Logger LOG = LoggerFactory.getLogger(SimpleSectionParser.class);
 
     protected final SectionDescriptor<T> sectionDescriptor;
@@ -30,7 +31,9 @@ public abstract class SimpleSectionParser<T> implements SectionParser<T> {
 
     private final String name;
 
-    public SimpleSectionParser(String name, List<T> objectToBuild, SectionDescriptor<T> sectionDescriptor) {
+    private SectionBox sectionBox;
+
+    public SimpleSectionParser(String name, List<T> objectToBuild, SectionDescriptor<T> sectionDescriptor, BiFunction<SectionDescriptor<T>, Integer, SectionBox> createSectionBox) {
         this.name = name;
         this.sectionDescriptor = sectionDescriptor;
         this.objectToBuild = objectToBuild;
@@ -39,10 +42,18 @@ public abstract class SimpleSectionParser<T> implements SectionParser<T> {
 //        TODO data will be ignored. Probably remove
         if (this.objectToBuild == null) {
             LOG.warn("Data will be ignored for section={}", name);
+            sectionBox = createSectionBox.apply(sectionDescriptor, 0);
+        } else {
+            sectionBox = createSectionBox.apply(sectionDescriptor, objectToBuild.size());
         }
         if (isStartIndexNotSet() && isStartValueNotSet()) {
             throw new IllegalStateException("Section startIndex and startValue are both undefined. You need to set at least one");
         }
+    }
+
+    @Override
+    public SectionBox getSectionBox() {
+        return sectionBox;
     }
 
     public String getName() {
@@ -51,10 +62,6 @@ public abstract class SimpleSectionParser<T> implements SectionParser<T> {
 
     protected int getRowCount() {
         return rowCount;
-    }
-
-    public SectionLocation getSectionLocation() {
-        return sectionDescriptor;
     }
 
     protected boolean isStarted() {
@@ -193,18 +200,15 @@ public abstract class SimpleSectionParser<T> implements SectionParser<T> {
     //TODO check if nextIndex can come from the sheet
     public abstract void write(Sheet sheet, SheetCursor cursor);
 
-    @Override
-    public String toString() {
-        return String.format("%s[%s]", getClass().getSimpleName(), getName());
-    }
-
     //TODO make test for all the combinations pivot-table in the same row probably with 3 sections
     protected Row getOrCreateRow(Sheet sheet, SheetCursor cursor) {
-        if (!sectionDescriptor.isDisplayNextRow()) {
-            return Optional
-                    .ofNullable(sheet.getRow(cursor.nextRow()))
-                    .orElse(sheet.createRow(cursor.nextRow()));
+        if (sectionDescriptor.isDisplaySameRow()) {
+            Row row = sheet.getRow(cursor.nextRow());
+            if (row != null) {
+                return row;
+            }
         }
+        LOG.trace("Created row={}", cursor.nextRow());
         return sheet.createRow(cursor.nextRow());
     }
 

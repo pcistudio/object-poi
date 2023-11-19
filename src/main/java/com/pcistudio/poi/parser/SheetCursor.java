@@ -19,12 +19,12 @@ public class SheetCursor {
 
     private int maxRowByObjectListSize;
 
-    private SectionLocation sectionLocation;
+    private SectionBox sectionBox;
 
     /**
      * This is the max number of rows in a group of sections next to each other.
      */
-    private int maxRowsSectionGroup;
+    private int maxRowsSectionGroup = 0;
 
     public SheetCursor() {
     }
@@ -35,7 +35,7 @@ public class SheetCursor {
 
     //TODO Performance This value can be set since the beginning of the section
     public int maxRowByFieldCount() {
-        return sectionStartRow + sectionLocation.getDescriptorMapSize();
+        return sectionStartRow + sectionBox.getRowCount();
     }
 
     //TODO Performance This value can be set since the beginning of the section
@@ -49,26 +49,23 @@ public class SheetCursor {
     }
 
     private void checkOverride() {
-        checkRowOverride();
-        checkColumnOverride();
-    }
-
-    //TODO test both override
-    private void checkColumnOverride() {
-        if (!sectionLocation.isDisplayNextRow() && nextCol > sectionLocation.getColumnStartIndex()) {
-            throw new IllegalStateException(String.format("About to override column %d with section=%s. " +
-                            "Check that previous section is not bigger than expected. lastWrittenColumn=%d, currentSectionStartColumn=%d", sectionLocation.getColumnStartIndex()
-                    , sectionName, nextCol, sectionLocation.getColumnStartIndex()));
+        if (rowOverride() && columnOverride()) {
+            throw new IllegalStateException(String.format("About to override data with section=%s. last written row=%d, col=%s . " +
+                            "Section starting at row=%d, col=%d", sectionName, nextRow,  nextCol, sectionBox.getRowStartIndex(), sectionBox.getColumnStartIndex()));
         }
     }
 
-    private void checkRowOverride() {
+    //TODO test both override
+    private boolean columnOverride() {
+        return sectionBox.isDisplaySameRow() && nextCol > sectionBox.getColumnStartIndex();
+    }
+
+    private boolean rowOverride() {
         //TODO to test this the second pivot needs to be isStartIndexSet = true
-        if (sectionLocation.isDisplayNextRow() && sectionLocation.isStartIndexSet() && nextRow > sectionLocation.getRowStartIndex()) {
-            throw new IllegalStateException(String.format("About to override row %d with section=%s. " +
-                            "Check that previous section is not bigger than expected. lastWrittenColumn=%d, currentSectionStartColumn=%d" +
-                            "For dynamic size better use startName property", sectionLocation.getRowStartIndex()
-                    , sectionName, nextRow, sectionLocation.getRowStartIndex()));
+        if (sectionBox.isDisplayNextRow()) {
+            return sectionBox.isStartIndexSet() && nextRow > sectionBox.getRowStartIndex();
+        } else {
+            return true;
         }
     }
 //
@@ -112,31 +109,47 @@ public class SheetCursor {
         }
     }
 
-    public void beginSection(String sectionName, SectionLocation sectionLocation, int objectListSize) {
+    public void beginSection(String sectionName, SectionBox sectionBox, int objectListSize) {
         this.sectionName = sectionName;
-        this.sectionLocation = sectionLocation;
+        this.sectionBox = sectionBox;
         this.objectListSize = objectListSize;
         checkOverride();
 
-        if (sectionLocation.isDisplayNextRow()) {
+        if (sectionBox.isDisplayNextRow()) {
             trace(LOG, "Begin section type=DisplayNextRow before");
-            nextCol = sectionLocation.getColumnStartIndex();
-            nextRow = sectionLocation.isStartIndexNotSet() ? nextRow : sectionLocation.getRowStartIndex();
+            nextCol = sectionBox.getColumnStartIndex();
+            nextRow = sectionBox.isStartIndexNotSet() ? maxRowsSectionGroup : sectionBox.getRowStartIndex();
             sectionStartRow = nextRow;
             sectionStartColumn = nextCol;
             trace(LOG, "Begin section type=DisplayNextRow");
+            setMaxRowsSectionGroup();
         } else {
-            nextCol = sectionLocation.getColumnStartIndex();
+            nextCol = sectionBox.getColumnStartIndex();
             sectionStartColumn = nextCol;
             nextRow = sectionStartRow;
+            updateMaxRowsSectionGroup();
         }
-        this.maxColByObjectListSize = sectionLocation.getColumnStartIndex() + objectListSize;
+        this.maxColByObjectListSize = sectionBox.getColumnStartIndex() + objectListSize;
         this.maxRowByObjectListSize = nextRow + objectListSize;
 
     }
 
+    void setMaxRowsSectionGroup() {
+        maxRowsSectionGroup = nextSectionRowIndex();
+    }
+
+    private int nextSectionRowIndex() {
+        return sectionBox.nextSectionRowIndex()
+                .orElse(nextRow + sectionBox.getRowCount());
+    }
+
+    void updateMaxRowsSectionGroup() {
+        maxRowsSectionGroup = Math.max(maxRowsSectionGroup, nextSectionRowIndex());
+    }
+
+
+
     public void trace(Logger logger, String messageStart) {
-//        logger.trace("{}. name={}, sectionStartRow={}, nextRow={}, nextCol={}, maxColByObjectListSize={}", messageStart, sectionName, sectionStartRow, nextRow, nextCol, maxColByObjectListSize());
         if (logger.isTraceEnabled()) {
             logger.trace("{}. {}", messageStart, toJson(this));
         }

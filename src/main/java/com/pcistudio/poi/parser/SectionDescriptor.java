@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Map;
 
 public class SectionDescriptor<T> implements SectionLocation {
+
     private int rowStartIndex = -1;
     private String startValue;
 
@@ -19,7 +20,7 @@ public class SectionDescriptor<T> implements SectionLocation {
 
     private Short columnCount;
 
-    private Short rowCount;
+    private Integer rowCount;
 
     private boolean displayNextRow = true;
 
@@ -35,7 +36,7 @@ public class SectionDescriptor<T> implements SectionLocation {
         return descriptorMap;
     }
 
-    public int getDescriptorMapSize() {
+    public int getRowCount() {
         return descriptorMapSize;
     }
 
@@ -57,6 +58,10 @@ public class SectionDescriptor<T> implements SectionLocation {
 
     public boolean isDisplayNextRow() {
         return displayNextRow;
+    }
+
+    public boolean isDisplaySameRow() {
+        return !isDisplayNextRow();
     }
 
     public boolean isStartValueNotSet() {
@@ -116,7 +121,7 @@ public class SectionDescriptor<T> implements SectionLocation {
             return this;
         }
 
-        public Builder<T> rowCount(Short rowCount) {
+        public Builder<T> rowCount(Integer rowCount) {
             descriptor.rowCount = rowCount;
             return this;
         }

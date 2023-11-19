@@ -13,23 +13,25 @@ import java.util.stream.Stream;
  *
  * @param <T>
  */
+//FIXME this is not a Parser name should be change
 public interface WriteSectionParser<T> extends NamedComponent {
     //    SectionDescriptor<T> getSectionDescriptor();
-    SectionLocation getSectionLocation();
+    SectionBox getSectionBox();
 
     void write(Sheet sheet, SheetCursor cursor);
 
     int objectToBuildSize();
 
+
     static WriteSectionParser<?> compose(WriteSectionParser<?>... parsers) {
         return new WriteSectionParser.ComposeWriteSectionParser<>(List.of(parsers));
     }
 
-    class ComposeWriteSectionParser<T> implements WriteSectionParser<T> {
+    class ComposeWriteSectionParser<T> extends AbstractWriteSectionParser<T> {
         private final List<WriteSectionParser<?>> writeSectionParsers;
         private final String name;
 
-        private ComposeSectionLocation sectionLocation;
+        private ComposeSectionBox sectionBox;
 
         private ComposeWriteSectionParser(List<WriteSectionParser<?>> writeSectionParsers) {
             Preconditions.notEmpty(writeSectionParsers, "Parser list cannot be empty");
@@ -37,9 +39,9 @@ public interface WriteSectionParser<T> extends NamedComponent {
                     .flatMap(compose())
                     .collect(Collectors.toList());
             this.name = NamedComponent.generateComposeName(writeSectionParsers);
-            this.sectionLocation = new ComposeSectionLocation(
+            this.sectionBox = new ComposeSectionBox(
                     writeSectionParsers.stream()
-                            .map(WriteSectionParser::getSectionLocation)
+                            .map(WriteSectionParser::getSectionBox)
                             .collect(Collectors.toList())
             );
         }
@@ -64,13 +66,15 @@ public interface WriteSectionParser<T> extends NamedComponent {
         }
 
         @Override
-        public SectionDescriptor<T> getSectionLocation() {
-            return null;
+        public SectionBox getSectionBox() {
+            return sectionBox;
         }
 
         @Override
         public void write(Sheet sheet, SheetCursor cursor) {
             for (WriteSectionParser<?> writeSectionParser : writeSectionParsers) {
+
+//                cursor.beginSection(writeSectionParser.getName(), writeSectionParser.getSectionBox(), writeSectionParser.objectToBuildSize());
                 writeSectionParser.write(sheet, cursor);
             }
         }
@@ -84,37 +88,59 @@ public interface WriteSectionParser<T> extends NamedComponent {
         }
     }
 
-    class ComposeSectionLocation implements SectionLocation {
+    class ComposeSectionBox implements SectionBox {
+        private int rowCount;
+        private short columnCount;
 
-        List<SectionLocation> sectionLocations;
+        private int rowStart;
 
-        public ComposeSectionLocation(List<SectionLocation> sectionLocations) {
-            this.sectionLocations = sectionLocations;
+        private int columnStart;
+
+        public ComposeSectionBox(List<SectionBox> sectionBoxes) {
+            Preconditions.notEmpty(sectionBoxes, "sectionBoxes cannot be empty");
+
+            rowCount = 0;
+            columnCount = 0;
+            for (SectionBox box : sectionBoxes) {
+                if (box.getRowCount() > rowCount) {
+                    rowCount = box.getRowCount();
+                }
+
+            }
+            SectionBox lastSection = sectionBoxes.get(sectionBoxes.size() - 1);
+            columnCount = (short)(lastSection.getColumnStartIndex() + lastSection.getColumnCount());
+            rowStart = sectionBoxes.get(0).getRowStartIndex();
+            columnStart = sectionBoxes.get(0).getColumnStartIndex();
         }
 
         @Override
         public int getRowStartIndex() {
-            return 0;
+            return rowStart;
         }
 
         @Override
-        public int getDescriptorMapSize() {
-            return 0;
+        public int getRowCount() {
+            return rowCount;
         }
 
         @Override
-        public Short getColumnCount() {
-            return null;
+        public short getColumnCount() {
+            return columnCount;
         }
 
         @Override
         public int getColumnStartIndex() {
-            return 0;
+            return columnStart;
         }
 
         @Override
         public boolean isDisplayNextRow() {
-            return false;
+            return true;
+        }
+
+        @Override
+        public boolean isStartIndexSet() {
+            return getRowStartIndex() != -1;
         }
     }
 

@@ -21,7 +21,7 @@ public class PivotSectionParser<T> extends SimpleSectionParser<T> {
     private static final Logger LOG = LoggerFactory.getLogger(PivotSectionParser.class);
 
     protected PivotSectionParser(String name, List<T> objectToBuild, SectionDescriptor<T> context) {
-        super(name, objectToBuild, context);
+        super(name, objectToBuild, context, PivotSectionBox::new);
     }
 
     /**
@@ -72,13 +72,16 @@ public class PivotSectionParser<T> extends SimpleSectionParser<T> {
         }
     }
 
+
+
     @Override
     //FIXME until now this is design to only write by row. Can not have sections next to each other
     // to have that we need and object that keep track of the lastRowWritten and lastColumn
     // in the builder we will need sameRow() or nextRow() functions
     // and in the SectionParser we will need a some properties that tell the writer to write in the next row or in the same row.
     public void write(Sheet sheet, SheetCursor cursor) {
-
+        cursor.beginSection(getName(), getSectionBox(), objectToBuildSize());
+        LOG.debug("Writing in sheet={}, section={}, nextRow={}, nextCol={}", sheet.getSheetName(), this, cursor.nextRow(), cursor.nextCol());
         if (objectToBuild == null) {
             LOG.warn("Ignoring section={} in sheet={}", getName(), sheet.getSheetName());
             return;
@@ -118,6 +121,4 @@ public class PivotSectionParser<T> extends SimpleSectionParser<T> {
         }
         cursor.endColumn();
     }
-
-
 }

@@ -48,7 +48,7 @@ public abstract class ColumnSheetParser<T> implements SheetParser<T> {
     }
 
     @SuppressWarnings("unchecked")
-    public void write(Sheet sheet, Object objToWrite) {
+    public void  write(Sheet sheet, Object objToWrite) {
         Objects.requireNonNull(objToWrite, "Trying to write a null object");
         if(objToWrite.getClass() != sheetClass()) {
             throw new IllegalArgumentException(String.format("Trying to write a type %s in a sheetClass=%s", objToWrite.getClass(), sheetClass()));
@@ -58,6 +58,8 @@ public abstract class ColumnSheetParser<T> implements SheetParser<T> {
         describeSections((T)objToWrite, builder);
         try (SectionParserManager sectionParserManager = builder.build()) {
             describeSections((T)objToWrite, sectionParserManager);
+            sectionParserManager.traceWrite();
+
             sectionParserManager.write(sheet);//here the objToWrite is not needed because the is already set
 //            for (int index = 0; index <= sheet.getLastRowNum(); index++) {
 //                Row row = sheet.getRow(index);
