@@ -13,12 +13,6 @@ public class SheetCursor {
     private int nextRow = 0;
     private int nextCol = 0;
 
-    private int objectListSize;
-
-    private int maxColByObjectListSize;
-
-    private int maxRowByObjectListSize;
-
     private SectionBox sectionBox;
 
     /**
@@ -37,12 +31,6 @@ public class SheetCursor {
     public int maxRowByFieldCount() {
         return sectionStartRow + sectionBox.getRowCount();
     }
-
-    //TODO Performance This value can be set since the beginning of the section
-    public int maxColByObjectListSize() {
-        return maxColByObjectListSize;
-    }
-
 
     public int nextCol() {
         return nextCol;
@@ -68,10 +56,6 @@ public class SheetCursor {
             return true;
         }
     }
-//
-//    public int nextRowStartIndex() {
-//       return nextRow = sectionDescriptor.isStartIndexNotSet() ? nextRow : sectionDescriptor.getRowStartIndex();
-//    }
 
     public void increaseRowIndex() {
         increaseRowIndex(1);
@@ -91,7 +75,7 @@ public class SheetCursor {
 
     public void endColumn() {
         increaseColIndex();
-        if (nextCol <= maxColByObjectListSize) {
+        if (nextCol <= sectionBox.nextSectionColIndex()) {
             nextRow = sectionStartRow;
             trace(LOG, "End column");
         } else {
@@ -101,7 +85,7 @@ public class SheetCursor {
 
     public void endRow() {
         increaseRowIndex();
-        if (nextRow <= maxRowByObjectListSize) {
+        if (nextRow <= maxRowsSectionGroup) {
             nextCol = sectionStartColumn;
             trace(LOG, "End row");
         } else {
@@ -112,9 +96,10 @@ public class SheetCursor {
     public void beginSection(String sectionName, SectionBox sectionBox, int objectListSize) {
         this.sectionName = sectionName;
         this.sectionBox = sectionBox;
-        this.objectListSize = objectListSize;
         checkOverride();
 
+        sectionStartRow = nextRow;
+        sectionStartColumn = nextCol;
         if (sectionBox.isDisplayNextRow()) {
             trace(LOG, "Begin section type=DisplayNextRow before");
             nextCol = sectionBox.getColumnStartIndex();
@@ -129,9 +114,6 @@ public class SheetCursor {
             nextRow = sectionStartRow;
             updateMaxRowsSectionGroup();
         }
-        this.maxColByObjectListSize = sectionBox.getColumnStartIndex() + objectListSize;
-        this.maxRowByObjectListSize = nextRow + objectListSize;
-
     }
 
     void setMaxRowsSectionGroup() {
@@ -156,7 +138,7 @@ public class SheetCursor {
     }
 
     public void debug(Logger logger, String messageStart) {
-        logger.debug("{}. name={}, sectionStartRow={}, nextRow={}, nextCol={}, maxColByObjectListSize={}", messageStart, sectionName, sectionStartRow, nextRow, nextCol, maxColByObjectListSize());
+        logger.debug("{}. name={}, sectionStartRow={}, nextRow={}, nextCol={}, maxColByObjectListSize={}", messageStart, sectionName, sectionStartRow, nextRow, nextCol, sectionBox.nextSectionColIndex());
     }
 
 
