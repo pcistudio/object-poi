@@ -98,8 +98,6 @@ public class SheetCursor {
         this.sectionBox = sectionBox;
         checkOverride();
 
-        sectionStartRow = nextRow;
-        sectionStartColumn = nextCol;
         if (sectionBox.isDisplayNextRow()) {
             trace(LOG, "Begin section type=DisplayNextRow before");
             nextCol = sectionBox.getColumnStartIndex();
