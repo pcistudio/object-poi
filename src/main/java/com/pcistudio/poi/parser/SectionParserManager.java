@@ -104,10 +104,7 @@ public class SectionParserManager implements AutoCloseable {
     }
 
     // TODO Try to separate the description from the Section Parser that is what create the tight coupling
-    //TODO Check that the columnCount for table has logic if you are planning to put sections in the same rows.
-    // You can determine columnCount by the number of fields in table
     public void write(Sheet sheet) {
-        //TODO complete this method
         SheetCursor cursor = new SheetCursor();
 
         for (SectionWriter<?> sectionParser : write) {
