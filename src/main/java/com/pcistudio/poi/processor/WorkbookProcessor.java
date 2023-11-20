@@ -26,16 +26,16 @@ public class WorkbookProcessor {
         this(List.of(sheetParsers));
     }
 
-    public WorkbookProcessor(Collection<SheetParser<?>> list) {
+    public WorkbookProcessor(List<SheetParser<?>> list) {
         this(true, list);
     }
 
-    public WorkbookProcessor(boolean failIfSheetNotFound, Collection<SheetParser<?>> list) {
+    public WorkbookProcessor(boolean failIfSheetNotFound, List<SheetParser<?>> list) {
         if (CollectionUtils.isEmpty(list)) {
             throw new IllegalStateException("SheetParser list cannot be empty");
         }
         //TODO: Try to make it a unmodified
-        sheetParsers = new ArrayList<>(list);
+        sheetParsers = Collections.unmodifiableList(list);
         parserBySheetName = sheetParsers.stream()
                 .collect(Collectors.toMap(SheetParser::getSheetName, object -> object));
 

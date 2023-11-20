@@ -14,6 +14,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -30,11 +31,11 @@ public class DefaultWorkbookWriter extends WorkbookProcessor implements Workbook
         super(sheetParsers);
     }
 
-    public DefaultWorkbookWriter(Collection<SheetParser<?>> list) {
+    public DefaultWorkbookWriter(List<SheetParser<?>> list) {
         super(list);
     }
 
-    public DefaultWorkbookWriter(boolean failIfSheetNotFound, Collection<SheetParser<?>> list) {
+    public DefaultWorkbookWriter(boolean failIfSheetNotFound, List<SheetParser<?>> list) {
         super(failIfSheetNotFound, list);
     }
 

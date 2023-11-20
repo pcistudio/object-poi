@@ -16,8 +16,6 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class DefaultWorkbookReader extends WorkbookProcessor implements WorkbookReader {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultWorkbookReader.class);
@@ -26,11 +24,11 @@ public class DefaultWorkbookReader extends WorkbookProcessor implements Workbook
         super(sheetParsers);
     }
 
-    public DefaultWorkbookReader(Collection<SheetParser<?>> list) {
+    public DefaultWorkbookReader(List<SheetParser<?>> list) {
         super(list);
     }
 
-    public DefaultWorkbookReader(boolean failIfSheetNotFound, Collection<SheetParser<?>> list) {
+    public DefaultWorkbookReader(boolean failIfSheetNotFound, List<SheetParser<?>> list) {
         super(failIfSheetNotFound, list);
     }
 
