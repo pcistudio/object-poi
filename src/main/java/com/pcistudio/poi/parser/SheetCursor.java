@@ -19,6 +19,11 @@ public class SheetCursor {
      */
     private int maxRowsSectionGroup = 0;
 
+    /**
+     * This is the max number of rows in current section
+     */
+    private int maxRowIndex = 0;
+
     public SheetCursor() {
     }
 
@@ -26,9 +31,8 @@ public class SheetCursor {
         return nextRow;
     }
 
-    //TODO Performance This value can be set since the beginning of the section
-    public int maxRowByFieldCount() {
-        return sectionStartRow + sectionBox.getRowCount();
+    public int getMaxRowIndex() {
+        return maxRowIndex;
     }
 
     public int nextCol() {
@@ -96,6 +100,7 @@ public class SheetCursor {
         this.sectionName = sectionName;
         this.sectionBox = sectionBox;
         checkOverride();
+        maxRowIndex = sectionStartRow + sectionBox.getRowCount();
 
         if (sectionBox.isDisplayNextRow()) {
             trace(LOG, "Begin section type=DisplayNextRow before");

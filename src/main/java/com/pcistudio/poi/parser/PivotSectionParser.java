@@ -120,7 +120,7 @@ public class PivotSectionParser<T> extends SimpleSectionParser<T> {
 
     private void writeColumnData(Sheet sheet, SheetCursor cursor,T obj) {
         LOG.debug("Writing in sheet={}, section={}, starting at row=[{}:{}], with column={}",
-                sheet.getSheetName(), getName(), cursor.nextRow(), cursor.maxRowByFieldCount(), cursor.nextCol());
+                sheet.getSheetName(), getName(), cursor.nextRow(), cursor.getMaxRowIndex(), cursor.nextCol());
         for (FieldDescriptor fieldDescriptor: sectionDescriptor.getDescriptorMap().values()) {
             Row row = sheet.getRow(cursor.nextRow());
             Cell cell = row.createCell(cursor.nextCol());
