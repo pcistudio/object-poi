@@ -39,7 +39,7 @@ public abstract class SimpleSectionParser<T> extends AbstractSectionWriter<T> im
         this.objectToBuild = objectToBuild;
 //
         Preconditions.allOrNothing("objectToBuild, recordClass must to be set together. Please check builder", objectToBuild, sectionDescriptor.getRecordClass());
-//        TODO data will be ignored. Probably remove
+
         if (this.objectToBuild == null) {
             LOG.warn("Data will be ignored for section={}", name);
             sectionBox = createSectionBox.apply(sectionDescriptor, 0);
@@ -193,12 +193,10 @@ public abstract class SimpleSectionParser<T> extends AbstractSectionWriter<T> im
     }
 
     /**
-     * Write to the sheet and return the count of records written
+     * Write to the sheet with the help of SheetCursor that keep all the indexes needed
       * @param sheet
-     * @param nextIndex last row written, useful to check that we are not overriding written
-     * @return count of records written
+     * @param SheetCursor maintain all the indexes needed to write inthe sections
      */
-    //TODO check if nextIndex can come from the sheet
     public abstract void write(Sheet sheet, SheetCursor cursor);
 
     //TODO make test for all the combinations pivot-table in the same row probably with 3 sections

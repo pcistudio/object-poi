@@ -108,8 +108,7 @@ public class SectionParserManager implements AutoCloseable {
         SheetCursor cursor = new SheetCursor();
 
         for (SectionWriter<?> sectionParser : write) {
-
-                sectionParser.write(sheet, cursor);
+            sectionParser.write(sheet, cursor);
             LOG.debug("Finish writing in sheet='{}', section='{}', nextRow={}, nextCol={}", sheet.getSheetName(), sectionParser, cursor.nextRow(), cursor.nextCol());
         }
         LOG.info("Write in {} Completed", sheet.getSheetName());
