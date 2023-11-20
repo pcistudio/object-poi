@@ -109,9 +109,7 @@ public class PoiUtil {
     }
 
     public static void fillCell(Cell cell, FieldDescriptor fieldDescriptor, Object obj) {
-        //TODO: at some point add a format support and ad formula support can not be set with the native support example SUM(E5:E6)
-        // Looks like formula will complicate this a lot
-        // Possible solution pre-calculate formulas before calling the write to excel
+        // For formula columns  pre-calculate before calling the write to excel
         Objects.requireNonNull(obj, "object cannot by null");
         Class<?> type = fieldDescriptor.getFieldWrapType();
 

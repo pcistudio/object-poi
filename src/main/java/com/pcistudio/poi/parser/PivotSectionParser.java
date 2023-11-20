@@ -76,12 +76,16 @@ public class PivotSectionParser<T> extends SimpleSectionParser<T> {
 
     @Override
     protected void printResume() {
-        LOG.info("sectionParser='{}' found {} records", getName(), get().size());
-        if (sectionDescriptor.isKeyValue()) {
-            LOG.debug("sectionParser='{}' result={}", getName(), toJson(get()));
+        if (get().isEmpty()) {
+            LOG.warn("No record found for sectionParser='{}'", getName());
         } else {
-            get().stream().limit(10)
-                    .forEach(row -> LOG.debug("{}", toJson(row)));
+            LOG.info("sectionParser='{}' found {} records", getName(), get().size());
+            if (sectionDescriptor.isKeyValue()) {
+                LOG.debug("sectionParser='{}' result={}", getName(), toJson(get()));
+            } else {
+                get().stream().limit(10)
+                        .forEach(row -> LOG.debug("{}", toJson(row)));
+            }
         }
     }
 

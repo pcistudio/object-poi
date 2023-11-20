@@ -5,7 +5,6 @@ import com.pcistudio.poi.parser.DataField;
 public class CarRentalRecord {
     //TODO Do I check that the all the columns in the class are present in the excel
     // Or the other way around
-    // give the opportunity to fail if doesn't pass this check
 
 
     @DataField(name = "Plate Number")

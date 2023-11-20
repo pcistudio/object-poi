@@ -66,9 +66,13 @@ public class TableSectionParser<ROW_MODEL> extends SimpleSectionParser<ROW_MODEL
 
     @Override
     protected void printResume() {
-        LOG.info("sectionParser='{}' found {} columns, {} rows", getName(), columns.length, get().size());
-        get().stream().limit(10)
-                .forEach(rowModel -> LOG.debug("{}", toJson(rowModel)));
+        if (get().isEmpty()) {
+            LOG.warn("No record found for sectionParser='{}'", getName());
+        } else {
+            LOG.info("sectionParser='{}' found {} columns, {} rows", getName(), columns.length, get().size());
+            get().stream().limit(10)
+                    .forEach(rowModel -> LOG.debug("{}", toJson(rowModel)));
+        }
     }
 
     @Override
