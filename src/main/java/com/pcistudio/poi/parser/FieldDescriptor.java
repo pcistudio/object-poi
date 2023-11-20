@@ -11,8 +11,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-//TODO Found 7 columns. [FY6786, 2022, FORD, F-250, 100, 24, E9*F9]. Get an exception when the none of the
-// columns match the expected columns
 public class FieldDescriptor implements Comparable<FieldDescriptor>{
     private static final Logger LOG = LoggerFactory.getLogger(FieldDescriptor.class);
 

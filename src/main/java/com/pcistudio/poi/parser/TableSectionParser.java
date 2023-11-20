@@ -37,10 +37,10 @@ public class TableSectionParser<ROW_MODEL> extends SimpleSectionParser<ROW_MODEL
     public void doAccept(Row row) {
         int columnIndex = 0;
         ROW_MODEL modelObject = newInstance();
-        //TODO Remove this if
         if (row.getCell(sectionDescriptor.getColumnStartIndex()) == null) {
             return;
         }
+
         int sectionLastIndex = getSectionLastCellIndex(row);
         for (int i = sectionDescriptor.getColumnStartIndex(); i < sectionLastIndex; i++) {
             final Cell cell = row.getCell(i);
