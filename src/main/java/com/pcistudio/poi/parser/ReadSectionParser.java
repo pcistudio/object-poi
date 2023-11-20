@@ -15,8 +15,7 @@ import java.util.stream.Stream;
  */
 public interface ReadSectionParser extends NamedComponent {
 
-    //TODO Remove the rowIndex is the same as row.getRowNum()
-    boolean isActive(Row row, int rowIndex);
+    boolean isActive(Row row);
 
     void accept(Row row);
     void notifyCompletion();
@@ -57,15 +56,15 @@ public interface ReadSectionParser extends NamedComponent {
         }
 
         @Override
-        public boolean isActive(Row row, int rowIndex) {
+        public boolean isActive(Row row) {
             return readSectionParsers.stream()
-                    .anyMatch(readSectionParser -> readSectionParser.isActive(row, rowIndex));
+                    .anyMatch(readSectionParser -> readSectionParser.isActive(row));
         }
 
         @Override
         public void accept(Row row) {
             for (ReadSectionParser sectionParser: readSectionParsers) {
-                if (sectionParser.isActive(row, row.getRowNum())) {
+                if (sectionParser.isActive(row)) {
                     sectionParser.accept(row);
                 }
             }

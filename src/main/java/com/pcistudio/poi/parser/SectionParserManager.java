@@ -36,14 +36,14 @@ public class SectionParserManager implements AutoCloseable {
         return this;
     }
 
-    public ReadSectionParser get(Row row, int rowIndex) {
+    public ReadSectionParser get(Row row) {
         if (read.isEmpty()) {
             throw new IllegalStateException("There is none SectionParser register ");
         }
         for (int i = read.size() - 1; i >= 0; i--) {
             ReadSectionParser sectionParser = read.get(i);
-            if (sectionParser.isActive(row, rowIndex)) {
-                setCurrentParser(sectionParser, rowIndex);
+            if (sectionParser.isActive(row)) {
+                setCurrentParser(sectionParser, row.getRowNum());
                 return currentSectionParser;
             }
         }

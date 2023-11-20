@@ -37,7 +37,7 @@ public abstract class ColumnSheetParser<T> implements SheetParser<T> {
                 if (row != null) {
                     // compose SectionParser to be able to send the same row to both
                     // to put them together i have to relay in a property set in the builder
-                    ReadSectionParser sectionParser = sectionParserManager.get(row, index);
+                    ReadSectionParser sectionParser = sectionParserManager.get(row);
                     sectionParser.accept(row);
                 } else {
                     LOG.trace("Empty row {}", index);

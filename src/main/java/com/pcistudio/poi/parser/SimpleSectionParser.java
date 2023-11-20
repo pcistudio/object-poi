@@ -97,11 +97,11 @@ public abstract class SimpleSectionParser<T> extends AbstractSectionWriter<T> im
         return sectionDescriptor.getStartValue().equals(cellValue);
     }
 
-    public boolean isActive(Row row, int rowIndex) {
+    public boolean isActive(Row row) {
         if (started) {
             return true;
         }
-        return started = isActive(row.getCell(sectionDescriptor.getColumnStartIndex()), rowIndex);
+        return started = isActive(row.getCell(sectionDescriptor.getColumnStartIndex()), row.getRowNum());
     }
 
     private boolean isActive(Cell cell, int rowIndex) {
