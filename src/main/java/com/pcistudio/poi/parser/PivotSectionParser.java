@@ -52,8 +52,17 @@ public class PivotSectionParser<T> extends SimpleSectionParser<T> {
         }
     }
 
+
     @Override
     public void doFirstRow(Row row) {
+        String columnName = PoiUtil.cellStringTrim(row.getCell(sectionDescriptor.getColumnStartIndex()));
+        FieldDescriptor fieldDescriptor = sectionDescriptor.getDescriptorMap().get(columnName);
+
+        if (fieldDescriptor == null) {
+            LOG.warn("Column={} not present in section={}", columnName, getName());
+            return;
+        }
+
         int sectionLastCellIndex = getSectionLastCellIndex(row);
         for (int i = sectionDescriptor.getColumnStartIndex() + 1; i < sectionLastCellIndex; i++) {
             objectToBuild.add(newInstance());

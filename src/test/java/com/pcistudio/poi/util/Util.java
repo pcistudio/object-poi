@@ -1,9 +1,6 @@
 package com.pcistudio.poi.util;
 
-import com.pcistudio.poi.parser.impl.FullRevenueColumnSheetParser;
-import com.pcistudio.poi.parser.impl.FullRevenueColumnSheetParser2;
-import com.pcistudio.poi.parser.impl.RevenueColumnSheetParser;
-import com.pcistudio.poi.parser.impl.RevenueMultiRowSectionColumnSheetParser;
+import com.pcistudio.poi.parser.impl.*;
 import com.pcistudio.poi.processor.DefaultWorkbookReader;
 import com.pcistudio.poi.processor.WorkbookReader;
 import com.pcistudio.poi.report.CarRentalWorkbook;
@@ -52,6 +49,26 @@ public class Util {
     public static CarRentalWorkbook fullCarRentalWithStartIndexExample(String file) throws IOException {
         try (InputStream inputStream = ioStream(file)) {
             WorkbookReader workbookReader = new DefaultWorkbookReader(new FullRevenueColumnSheetParser2());
+            return workbookReader.parseToObject(inputStream, CarRentalWorkbook.class);
+        }
+    }
+
+    public static CarRentalWorkbook fullRevenueColumnSheetParserNotReadingHeaderExample() throws IOException {
+        return fullRevenueColumnSheetParserNotReadingHeaderExample("CarRental.xlsx");
+    }
+    public static CarRentalWorkbook fullRevenueColumnSheetParserNotReadingHeaderExample(String file) throws IOException {
+        try (InputStream inputStream = ioStream(file)) {
+            WorkbookReader workbookReader = new DefaultWorkbookReader(new FullRevenueColumnSheetParserNotReadingHeader());
+            return workbookReader.parseToObject(inputStream, CarRentalWorkbook.class);
+        }
+    }
+
+    public static CarRentalWorkbook fullFullRevenueColumnSheetParserNotFoundingLastSectionExample() throws IOException {
+        return fullRevenueColumnSheetParserNotReadingHeaderExample("CarRental.xlsx");
+    }
+    public static CarRentalWorkbook fullFullRevenueColumnSheetParserNotFoundingLastSectionExample(String file) throws IOException {
+        try (InputStream inputStream = ioStream(file)) {
+            WorkbookReader workbookReader = new DefaultWorkbookReader(new FullRevenueColumnSheetParserNotFoundingLastSection());
             return workbookReader.parseToObject(inputStream, CarRentalWorkbook.class);
         }
     }

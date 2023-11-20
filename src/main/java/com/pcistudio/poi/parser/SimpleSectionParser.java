@@ -158,6 +158,7 @@ public abstract class SimpleSectionParser<T> extends AbstractWriteSectionParser<
         }
         FieldDescriptor fieldDescriptor = sectionDescriptor.getDescriptorMap().get(columnName);
         if (fieldDescriptor == null) {
+            LOG.warn("Column={} not configure in object={}", columnName, modelObject.getClass().getSimpleName());
             return;
         }
         String value = PoiUtil.cellStringTrim(valueCell, fieldDescriptor.getFormat());

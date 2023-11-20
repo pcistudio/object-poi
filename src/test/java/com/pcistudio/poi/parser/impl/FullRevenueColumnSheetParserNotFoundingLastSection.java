@@ -8,7 +8,7 @@ import com.pcistudio.poi.report.CarRentalRevenue;
 import com.pcistudio.poi.report.CarRentalTotal;
 
 //rows
-public class FullRevenueColumnSheetParserNotReadingHeader extends ColumnSheetParser<CarRentalRevenue> {
+public class FullRevenueColumnSheetParserNotFoundingLastSection extends ColumnSheetParser<CarRentalRevenue> {
 
     @Override
     protected void describeSections(CarRentalRevenue carRentalRevenue, SectionParserManagerBuilder builder) {
@@ -37,7 +37,8 @@ public class FullRevenueColumnSheetParserNotReadingHeader extends ColumnSheetPar
                         .withColumnStartIndex(7)
                         .withObjectToBuild(carRentalRevenue.getCarRentalTotals())
                         .keyValue()
-                        .withRowStartIndex(16));
+                        .withStartValue("Total Revenue\n(Last Month)"));
+
     }
 
     @Override

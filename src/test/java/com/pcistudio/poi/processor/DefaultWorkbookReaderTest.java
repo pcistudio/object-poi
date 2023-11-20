@@ -108,32 +108,46 @@ class DefaultWorkbookReaderTest {
         assertEquals("Toyota Everglades", carRentalAgentInfo.getDealer());
     }
 
-//    @Test
-//    void testMultiRowSectionRevenueReport() throws IOException {
-//        CarRentalWorkbook carRentalWorkbook = Util.multiSectionCarRentalExample();
-//
-//        CarRentalHeader carRentalHeader = carRentalWorkbook.getCarRentalRevenue().getCarRentalHeaders().get(0);
-//        assertEquals("Car rental revenue", carRentalHeader.getReportTitle());
-//        assertEquals("9", carRentalHeader.getTotalRecords());
-//
-//        List<CarRentalRecord> carRentalRecords = carRentalWorkbook.getCarRentalRevenue().getCarRentalRecords();
-//        CarRentalRecord carRentalRecord = carRentalRecords.get(0);
-//        assertEquals("FG3425", carRentalRecord.getPlateNumber());
-//        assertEquals("2023", carRentalRecord.getModelYear());
-//        assertEquals("TOYOTA", carRentalRecord.getMaker());
-//
-//        CarRentalRecord carRentalRecord1 = carRentalRecords.get(8);
-//        assertEquals("Y5RTGM", carRentalRecord1.getPlateNumber());
-//        assertEquals("2022", carRentalRecord1.getModelYear());
-//        assertEquals("HYUNDAI", carRentalRecord1.getMaker());
-//
-//        List<CarRentalTotal> carRentalTotals = carRentalWorkbook.getCarRentalRevenue().getCarRentalTotals();
-//        CarRentalTotal carRentalTotal = carRentalTotals.get(0);
-//        assertEquals("17,819.04", carRentalTotal.getTotalRevenue());
-//
-//        List<CarRentalAgentInfo> carRentalAgentInfos = carRentalWorkbook.getCarRentalRevenue().getCarRentalAgents();
-//        CarRentalAgentInfo carRentalAgentInfo = carRentalAgentInfos.get(0);
-//        assertEquals("Peter Pan", carRentalAgentInfo.getAgent());
-//        assertEquals("Toyota Everglades", carRentalAgentInfo.getDealer());
-//    }
+    @Test
+    void testFullRevenueColumnSheetParserNotFoundingLastSectionExample() throws IOException {
+        CarRentalWorkbook carRentalWorkbook = Util.fullFullRevenueColumnSheetParserNotFoundingLastSectionExample();
+        CarRentalHeader carRentalHeader = carRentalWorkbook.getCarRentalRevenue().getCarRentalHeaders().get(0);
+        assertEquals("Car rental revenue", carRentalHeader.getReportTitle());
+        assertEquals("9", carRentalHeader.getTotalRecords());
+
+        List<CarRentalRecord> carRentalRecords = carRentalWorkbook.getCarRentalRevenue().getCarRentalRecords();
+        CarRentalRecord carRentalRecord = carRentalRecords.get(0);
+        assertEquals("FG3425", carRentalRecord.getPlateNumber());
+        assertEquals("2023", carRentalRecord.getModelYear());
+        assertEquals("TOYOTA", carRentalRecord.getMaker());
+
+        CarRentalRecord carRentalRecord1 = carRentalRecords.get(8);
+        assertEquals("Y5RTGM", carRentalRecord1.getPlateNumber());
+        assertEquals("2022", carRentalRecord1.getModelYear());
+        assertEquals("HYUNDAI", carRentalRecord1.getMaker());
+
+        assertEquals(0, carRentalWorkbook.getCarRentalRevenue().getCarRentalTotals().size());
+    }
+
+    @Test
+    void testFullRevenueColumnSheetParserNotReadingHeaderExample() throws IOException {
+        CarRentalWorkbook carRentalWorkbook = Util.fullRevenueColumnSheetParserNotReadingHeaderExample();
+
+        CarRentalHeader carRentalHeader = carRentalWorkbook.getCarRentalRevenue().getCarRentalHeaders().get(0);
+        assertEquals("Car rental revenue", carRentalHeader.getReportTitle());
+        assertEquals("9", carRentalHeader.getTotalRecords());
+
+        List<CarRentalRecord> carRentalRecords = carRentalWorkbook.getCarRentalRevenue().getCarRentalRecords();
+        CarRentalRecord carRentalRecord = carRentalRecords.get(0);
+        assertEquals("FG3425", carRentalRecord.getPlateNumber());
+        assertEquals("2023", carRentalRecord.getModelYear());
+        assertEquals("TOYOTA", carRentalRecord.getMaker());
+
+        CarRentalRecord carRentalRecord1 = carRentalRecords.get(8);
+        assertEquals("Y5RTGM", carRentalRecord1.getPlateNumber());
+        assertEquals("2022", carRentalRecord1.getModelYear());
+        assertEquals("HYUNDAI", carRentalRecord1.getMaker());
+
+        assertEquals(0, carRentalWorkbook.getCarRentalRevenue().getCarRentalTotals().size());
+    }
 }

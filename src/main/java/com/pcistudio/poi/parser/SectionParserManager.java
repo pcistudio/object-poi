@@ -93,7 +93,14 @@ public class SectionParserManager implements AutoCloseable {
     private void checkAllReadParserWereUsed() {
         if (!read.get(read.size() - 1).equals(currentSectionParser)) {
             LOG.warn("Not all parser were used. Last parser used {}", currentSectionParser);
+            printLeftoverParsers();
         }
+    }
+
+    private void printLeftoverParsers() {
+        int index = read.indexOf(currentSectionParser);
+        List<ReadSectionParser> leftOverParsers = read.subList(index + 1, read.size());
+        LOG.warn("Parsers never used={}", leftOverParsers);
     }
 
     // TODO Try to separate the description from the Section Parser that is what create the tight coupling
