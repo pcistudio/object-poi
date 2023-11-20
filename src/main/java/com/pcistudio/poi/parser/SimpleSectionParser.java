@@ -19,7 +19,7 @@ import static com.pcistudio.poi.util.SecurityUtil.sanitize;
  * This class needs to be new every time that you are trying to use it because it is stateful
  * @param <T>
  */
-public abstract class SimpleSectionParser<T> extends AbstractWriteSectionParser<T> implements SectionParser<T> {
+public abstract class SimpleSectionParser<T> extends AbstractSectionWriter<T> implements SectionParser<T> {
     private static final Logger LOG = LoggerFactory.getLogger(SimpleSectionParser.class);
 
     protected final SectionDescriptor<T> sectionDescriptor;

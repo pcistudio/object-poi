@@ -5,7 +5,7 @@ package com.pcistudio.poi.parser;
  *
  * @param <T>
  */
-public interface SectionParser<T> extends ReadSectionParser, WriteSectionParser<T> {
+public interface SectionParser<T> extends ReadSectionParser, SectionWriter<T> {
 
 
 }

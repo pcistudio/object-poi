@@ -56,6 +56,10 @@ public class PivotSectionParser<T> extends SimpleSectionParser<T> {
     @Override
     public void doFirstRow(Row row) {
         String columnName = PoiUtil.cellStringTrim(row.getCell(sectionDescriptor.getColumnStartIndex()));
+        if (columnName == null) {
+            LOG.warn("Empty cell ({},{}). ColumnName expected in section={}", sectionDescriptor.getColumnStartIndex(), row.getRowNum(), getName());
+            return;
+        }
         FieldDescriptor fieldDescriptor = sectionDescriptor.getDescriptorMap().get(columnName);
 
         if (fieldDescriptor == null) {

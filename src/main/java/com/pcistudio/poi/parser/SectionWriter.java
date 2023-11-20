@@ -14,7 +14,7 @@ import java.util.stream.Stream;
  * @param <T>
  */
 //FIXME this is not a Parser name should be change
-public interface WriteSectionParser<T> extends NamedComponent {
+public interface SectionWriter<T> extends NamedComponent {
     //    SectionDescriptor<T> getSectionDescriptor();
     SectionBox getSectionBox();
 
@@ -23,35 +23,35 @@ public interface WriteSectionParser<T> extends NamedComponent {
     int objectToBuildSize();
 
 
-    static WriteSectionParser<?> compose(WriteSectionParser<?>... parsers) {
-        return new WriteSectionParser.ComposeWriteSectionParser<>(List.of(parsers));
+    static SectionWriter<?> compose(SectionWriter<?>... parsers) {
+        return new ComposeSectionWriter<>(List.of(parsers));
     }
 
-    class ComposeWriteSectionParser<T> extends AbstractWriteSectionParser<T> {
-        private final List<WriteSectionParser<?>> writeSectionParsers;
+    class ComposeSectionWriter<T> extends AbstractSectionWriter<T> {
+        private final List<SectionWriter<?>> sectionWriters;
         private final String name;
 
         private ComposeSectionBox sectionBox;
 
-        private ComposeWriteSectionParser(List<WriteSectionParser<?>> writeSectionParsers) {
-            Preconditions.notEmpty(writeSectionParsers, "Parser list cannot be empty");
-            this.writeSectionParsers = writeSectionParsers.stream()
+        private ComposeSectionWriter(List<SectionWriter<?>> sectionWriters) {
+            Preconditions.notEmpty(sectionWriters, "Parser list cannot be empty");
+            this.sectionWriters = sectionWriters.stream()
                     .flatMap(compose())
                     .collect(Collectors.toList());
-            this.name = NamedComponent.generateComposeName(writeSectionParsers);
+            this.name = NamedComponent.generateComposeName(sectionWriters);
             this.sectionBox = new ComposeSectionBox(
-                    writeSectionParsers.stream()
-                            .map(WriteSectionParser::getSectionBox)
+                    sectionWriters.stream()
+                            .map(SectionWriter::getSectionBox)
                             .collect(Collectors.toList())
             );
         }
 
-        private static Function<WriteSectionParser<?>, Stream<WriteSectionParser<?>>> compose() {
-            return writeSectionParser -> {
-                if (writeSectionParser instanceof ComposeWriteSectionParser) {
-                    return ((ComposeWriteSectionParser<?>) writeSectionParser).getWriteSectionParsers().stream();
+        private static Function<SectionWriter<?>, Stream<SectionWriter<?>>> compose() {
+            return sectionWriter -> {
+                if (sectionWriter instanceof SectionWriter.ComposeSectionWriter) {
+                    return ((ComposeSectionWriter<?>) sectionWriter).getWriteSectionParsers().stream();
                 } else {
-                    return Stream.of(writeSectionParser);
+                    return Stream.of(sectionWriter);
                 }
             };
         }
@@ -61,8 +61,8 @@ public interface WriteSectionParser<T> extends NamedComponent {
             return name;
         }
 
-        private List<WriteSectionParser<?>> getWriteSectionParsers() {
-            return writeSectionParsers;
+        private List<SectionWriter<?>> getWriteSectionParsers() {
+            return sectionWriters;
         }
 
         @Override
@@ -72,17 +72,17 @@ public interface WriteSectionParser<T> extends NamedComponent {
 
         @Override
         public void write(Sheet sheet, SheetCursor cursor) {
-            for (WriteSectionParser<?> writeSectionParser : writeSectionParsers) {
+            for (SectionWriter<?> sectionWriter : sectionWriters) {
 
 //                cursor.beginSection(writeSectionParser.getName(), writeSectionParser.getSectionBox(), writeSectionParser.objectToBuildSize());
-                writeSectionParser.write(sheet, cursor);
+                sectionWriter.write(sheet, cursor);
             }
         }
 
         @Override
         public int objectToBuildSize() {
-            return writeSectionParsers.stream()
-                    .mapToInt(WriteSectionParser::objectToBuildSize)
+            return sectionWriters.stream()
+                    .mapToInt(SectionWriter::objectToBuildSize)
                     .max()
                     .getAsInt();
         }

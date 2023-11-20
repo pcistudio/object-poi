@@ -14,7 +14,7 @@ import java.util.List;
 //TODO At the end think if it is a good idea to set the startRow from the previews section in case startRow=-1 NOT SET
 public class SectionParserManager implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(SectionParserManager.class);
-    private final List<WriteSectionParser<?>> write = new ArrayList<>();
+    private final List<SectionWriter<?>> write = new ArrayList<>();
 
     private final List<ReadSectionParser> read = new ArrayList<>();
 
@@ -61,14 +61,14 @@ public class SectionParserManager implements AutoCloseable {
         }
     }
 
-    private void combineWriteParser(WriteSectionParser<?> sectionParser) {
+    private void combineWriteParser(SectionWriter<?> sectionParser) {
         if (write.isEmpty()) {
             LOG.warn("No preview writer to compose sectionParser. List is empty");
         } else {
             int last = write.size() - 1;
-            WriteSectionParser<?> composeWriteSectionParser = WriteSectionParser.compose(write.get(last), sectionParser);
-            LOG.trace("Created compose sectionParser={}", composeWriteSectionParser);
-            write.set(last, composeWriteSectionParser);
+            SectionWriter<?> composeSectionWriter = SectionWriter.compose(write.get(last), sectionParser);
+            LOG.trace("Created compose sectionParser={}", composeSectionWriter);
+            write.set(last, composeSectionWriter);
         }
     }
 
@@ -110,7 +110,7 @@ public class SectionParserManager implements AutoCloseable {
         //TODO complete this method
         SheetCursor cursor = new SheetCursor();
 
-        for (WriteSectionParser<?> sectionParser : write) {
+        for (SectionWriter<?> sectionParser : write) {
 
                 sectionParser.write(sheet, cursor);
             LOG.debug("Finish writing in sheet='{}', section='{}', nextRow={}, nextCol={}", sheet.getSheetName(), sectionParser, cursor.nextRow(), cursor.nextCol());

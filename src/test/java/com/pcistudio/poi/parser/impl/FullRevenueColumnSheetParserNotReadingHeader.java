@@ -30,7 +30,6 @@ public class FullRevenueColumnSheetParserNotReadingHeader extends ColumnSheetPar
          * this section has the real values in withColumnStartIndex(5)
          * here is changed to 7 and run the reader test and check if it alerts something about not reading any of the headers
          */
-        //TODO
 //        Section3
         builder.pivot(CarRentalTotal.class)
                 .describe(config -> config.withName("Total")
